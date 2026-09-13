@@ -1,0 +1,24 @@
+{
+  "name": "game-bank",
+  "version": "0.0.1",
+  "description": "Модуль для создания безопастного банка игры",
+  "keywords": [
+    "game",
+    "bank"
+  ],
+  "homepage": "https://github.com/RPM-programmer/game-bank#readme",
+  "bugs": {
+    "url": "https://github.com/RPM-programmer/game-bank/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RPM-programmer/game-bank.git"
+  },
+  "license": "ISC",
+  "author": "prm-programmer",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
