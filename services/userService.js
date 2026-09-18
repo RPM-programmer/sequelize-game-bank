@@ -4,7 +4,8 @@ const User = require('../models/User');
 require("dotenv").config();
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = 'SUPER_SECRET_BANK_KEY_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'SUPER_SECRET_BANK_KEY_2026';
+
 
 async function newUser(name, password, gmail) {
   try {

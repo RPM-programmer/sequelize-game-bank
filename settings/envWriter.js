@@ -16,16 +16,18 @@ const defaultEnvContent = `
 SEQUELIZE_GAME_BANK_FERIFY                   = true
 # Настройки nodemailer 
 # Модуль не растпросторяет ваши личные данные!
-GMAIL_PASSWORD                               = "ваша электронная почта"
+GMAIL                                        = "ваша электронная почта"
 GOOGLE_APP_PASSWORD                          = "ваш пароль приложения"
 
 # Настройки системы банка
 # Пароль админестратора
-ROOT_PASSWORD                                = ""
+ROOT_PASSWORD                                = "bank-root"
 
 # Глобальные настройки
 # Ипользовать модуль custom-color-logs для логирования
 USE_MODULE_FOR_LOG                           = true
+
+JWT_SECRET                                   = "SUPER_SECRET_BANK_KEY_2026"
 `;
 
 function initializeEnvironment() {

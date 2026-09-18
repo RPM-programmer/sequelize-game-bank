@@ -55,12 +55,5 @@ Account.belongsTo(User, {
   targetKey: 'user_name', 
   as: 'user' // ➡️ Этот алиас позволяет писать { include: 'user' }
 });
-// Перед тем как делать app.listen(3000, ...)
-sequelize.sync()
-  .then(() => {
-    console.log('База данных успешно синхронизирована (таблицы созданы/проверены)');
-  })
-  .catch(err => console.error('Ошибка синхронизации БД:', err));
-
 
 module.exports = Account;

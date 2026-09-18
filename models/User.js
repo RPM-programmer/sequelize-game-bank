@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-
+const bcrypt = require("bcrypt");
 const User = sequelize.define('user', {
   user_name: {
     type: DataTypes.STRING,
@@ -37,19 +37,14 @@ const User = sequelize.define('user', {
     }
   }
 });
+
 (async ()=>{
   const rootPasswordHash = await bcrypt.hash('bank-root', 10);
     await User.findOrCreate({
       where: { user_name: 'root' },
       defaults: { password: rootPasswordHash, gmail: 'admin@bank.com' }
     });
-});
-// Перед тем как делать app.listen(3000, ...)
-sequelize.sync()
-  .then(() => {
-    console.log('База данных успешно синхронизирована (таблицы созданы/проверены)');
-  })
-  .catch(err => console.error('Ошибка синхронизации БД:', err));
+})();
 
 
 module.exports = User;

@@ -1,6 +1,6 @@
 {
   "name": "sequelize-game-bank",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Создание игрового банка на sequelize",
   "keywords": [
     "sequelize",
@@ -32,5 +32,8 @@
     "nodemailer": "^10.0.10",
     "sequelize": "^6.37.8",
     "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
   }
 }

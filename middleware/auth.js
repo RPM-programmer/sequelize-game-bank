@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../services/userService');
+const JWT_SECRET = process.env.JWT_SECRET || 'SUPER_SECRET_BANK_KEY_2026';
 
 /**
  * Middleware для автоматической проверки авторизации через JWT куки

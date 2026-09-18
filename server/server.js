@@ -16,6 +16,15 @@ const userService = require('../services/userService');
 const accountService = require('../services/accountService');
 const { verifyToken } = require('../middleware/auth');
 
+// Перед тем как делать app.listen(3000, ...)
+sequelize.sync()
+  .then(() => {
+    console.log('База данных успешно синхронизирована (таблицы созданы/проверены)');
+  })
+  .catch(err => console.error('Ошибка синхронизации БД:', err));
+
+
+
 const app = express();
 
 // Базовые настройки Express внутри модуля

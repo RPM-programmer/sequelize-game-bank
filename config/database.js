@@ -12,7 +12,7 @@ if (!fs.existsSync(dbDir)) {
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: dbPath,
-  logging: console.log
+  logging: false
 });
 
 module.exports = sequelize;
