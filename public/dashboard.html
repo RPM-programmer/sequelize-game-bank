@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Game-Bank | Кабинет</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f6f9; color: #333; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #007bff; }
+        input, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
+        button { background: #28a745; color: white; border: none; cursor: pointer; font-size: 16px; }
+        button:hover { background: #218838; }
+        button.logout { background: #dc3545; width: auto; padding: 10px 20px; margin: 0; }
+        button.logout:hover { background: #c82333; }
+        .log-item { padding: 8px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .SUCCESS { color: green; }
+        .FAILED { color: red; font-weight: bold; }
+        
+        .btn-nav { 
+            display: none; 
+            background: #ffc107; 
+            color: #212529; 
+            font-weight: bold; 
+            text-decoration: none; 
+            padding: 10px 15px; 
+            border-radius: 4px; 
+            font-size: 14px; 
+        }
+        .btn-nav:hover { background: #e0a800; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2>🏦 Личный кабинет Game-Bank</h2>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="/admin.html" id="adminBtn" class="btn-nav">👑 Админ-панель</a>
+        <span id="userDisplay" style="font-weight: bold;">Загрузка...</span>
+        <button class="logout" onclick="handleLogout()">Выйти</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h3>💰 Ваши счета</h3>
+        <p><strong>Общий баланс всех счетов:</strong> <span id="totalBalance">0.00</span> руб.</p>
+        
+        <div style="background: #e9ecef; padding: 15px; border-radius: 6px; margin-top: 15px;">
+            <h4>Открыть новый счет</h4>
+            <input type="password" id="newAccPass" placeholder="Пароль для счета">
+            <input type="text" id="newAccPin" placeholder="Пин-код (4 цифры)">
+            <input type="number" id="newAccInit" placeholder="Стартовый баланс" value="0">
+            <button onclick="createAccount()">Создать счет</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>💸 Быстрый перевод между счетами</h3>
+        <input type="number" id="fromAcc" placeholder="ID вашего счета (отправитель)">
+        <input type="number" id="toAcc" placeholder="ID счета получателя">
+        <input type="number" id="amount" placeholder="Сумма перевода">
+        <input type="password" id="pincode" placeholder="Пин-код для подтверждения">
+        <button onclick="makeTransfer()" style="background: #007bff;">Отправить деньги</button>
+    </div>
+
+    <div class="card" style="grid-column: span 2;">
+        <h3>📜 История и аудит операций</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="number" id="historyAccId" placeholder="Введите ID счета для просмотра выписки" style="margin: 0;">
+            <button onclick="loadLogs()" style="width: auto; margin: 0; padding: 0 20px; background: #17a2b8;">Показать логи</button>
+        </div>
+        <div id="logsBox" style="max-height: 300px; overflow-y: auto; background: #fafafa; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
+            Введите ID счета и нажмите кнопку для загрузки истории.
+        </div>
+    </div>
+</div>
+
+<script>
+    async function loadDashboardData() {
+        try {
+            const res = await fetch('/api/accounts/total-balance');
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/index.html';
+                return;
+            }
+            const data = await res.json();
+
+                if (data.status) {
+        // Проверяем, если пришла бесконечность — выводим как текст, иначе округляем число
+        document.getElementById('totalBalance').innerText = 
+            data.totalBalance === 'Infinity' ? '∞' : parseFloat(data.totalBalance).toFixed(2);
+            
+        document.getElementById('userDisplay').innerText = `Игрок: ${data.username}`;
+        
+        if (data.username === 'root') {
+            document.getElementById('adminBtn').style.display = 'inline-block';
+        }
+    }
+
+        } catch (err) {
+            console.error("Ошибка запроса кабинета:", err);
+        }
+    }
+
+    async function createAccount() {
+        const password = document.getElementById('newAccPass').value;
+        const pincode = document.getElementById('newAccPin').value;
+        const initialBalance = document.getElementById('newAccInit').value;
+
+        const res = await fetch('/api/accounts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password, pincode, initialBalance })
+        });
+        const data = await res.json();
+        if (data.status) {
+            alert(`Счет успешно открыт! ID: ${data.account_id}`);
+            loadDashboardData();
+        } else {
+            alert('Ошибка: ' + data.message);
+        }
+    }
+
+    async function makeTransfer() {
+        const fromAccountId = document.getElementById('fromAcc').value;
+        const toAccountId = document.getElementById('toAcc').value;
+        const amount = document.getElementById('amount').value;
+        const pincode = document.getElementById('pincode').value;
+
+        const res = await fetch('/api/accounts/transfer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fromAccountId, toAccountId, amount, pincode })
+        });
+        const data = await res.json();
+        alert(data.message);
+        loadDashboardData();
+    }
+
+    async function loadLogs() {
+        const id = document.getElementById('historyAccId').value;
+        if (!id) return alert('Введите ID счета');
+
+        const res = await fetch(`/api/accounts/${id}/logs`);
+        const data = await res.json();
+        const box = document.getElementById('logsBox');
+        box.innerHTML = '';
+
+        if (data.status && data.history.length > 0) {
+            data.history.forEach(log => {
+                const div = document.createElement('div');
+                div.className = `log-item ${log.status}`;
+                div.innerHTML = `[${new Date(log.createdAt).toLocaleString()}] <strong>${log.type}</strong> | Сумма: ${parseFloat(log.amount).toFixed(2)} руб. | Статус: ${log.status} ${log.details ? `(\${log.details})` : ''}`;
+                box.appendChild(div);
+            });
+        } else {
+            box.innerText = 'Истории операций по этому счету пока нет или счет не найден.';
+        }
+    }
+
+    async function handleLogout() {
+        await fetch('/api/users/logout', { method: 'POST' });
+        window.location.href = '/index.html';
+    }
+
+    loadDashboardData();
+</script>
+</body>
+</html>

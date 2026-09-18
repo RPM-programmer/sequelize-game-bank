@@ -1,0 +1,5 @@
+.env
+.env.example
+x.zip
+test.js
+logs/
