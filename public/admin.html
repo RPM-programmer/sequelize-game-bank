@@ -1,307 +1,194 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Game-Bank | Панель Администратора</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #212529; color: #f8f9fa; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: #343a40; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .container { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
-        .card { background: #343a40; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); position: relative; }
-        h3 { margin-top: 0; border-bottom: 2px solid #495057; padding-bottom: 10px; color: #ffc107; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #495057; }
-        th { background: #495057; color: #ffc107; }
-        button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-block { background: #dc3545; color: white; }
-        .btn-block:hover { background: #bd2130; }
-        .btn-unblock { background: #28a745; color: white; }
-        .btn-unblock:hover { background: #218838; }
-        .btn-nav { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px; }
-        .status-frozen { color: #dc3545; font-weight: bold; }
-        .status-active { color: #28a745; }
-        
-        /* Кликабельный баланс */
-        .clickable-balance { color: #ffc107; cursor: pointer; text-decoration: underline; font-weight: bold; }
-        .clickable-balance:hover { color: #fff; }
-
-        .loading-overlay { display: flex; align-items: center; justify-content: center; gap: 15px; padding: 30px; font-style: italic; color: #ffc107; }
-        .spinner { width: 30px; height: 30px; border: 4px solid rgba(255, 193, 7, 0.1); border-top: 4px solid #ffc107; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* СТИЛИ МОДАЛЬНОГО ОКНА (ДИАЛОГА) */
-        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #343a40; padding: 25px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); width: 100%; max-width: 350px; border: 1px solid #495057; }
-        .modal-content h4 { margin-top: 0; color: #ffc107; border-bottom: 1px solid #495057; padding-bottom: 10px; }
-        .modal-step { display: none; }
-        .modal-step.active { display: block; }
-        .radio-group { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
-        .radio-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 16px; }
-        .modal-content input[type="number"] { width: 100%; padding: 10px; margin: 15px 0; background: #212529; border: 1px solid #495057; color: white; border-radius: 4px; box-sizing: border-box; }
-        .modal-buttons { display: flex; justify-content: space-between; gap: 10px; margin-top: 15px; }
-        .btn-modal-next { background: #007bff; color: white; width: 100%; padding: 10px; }
-        .btn-modal-cancel { background: #6c757d; color: white; width: 100%; padding: 10px; }
-        .btn-modal-confirm { background: #28a745; color: white; width: 100%; padding: 10px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>City-bank | Центральный пульт ROOT</title>
+  <style>
+    :root {
+      --bg: #2c3e50;
+      --card: #34495e;
+      --text: #ffffff;
+      --primary: #007bff;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+    }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 30px; margin: 0; }
+    .container { background: var(--card); padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 1000px; margin: 0 auto; }
+    h2 { color: var(--warning); margin-top: 0; text-align: center; letter-spacing: 1px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; color: #333; border-radius: 6px; overflow: hidden; }
+    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #e9ecef; font-weight: bold; }
+    .btn { padding: 8px 14px; border: none; background: var(--primary); color: white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn-ban { background: var(--danger); }
+    .btn-unban { background: var(--success); }
+    .manny-click { color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline; }
+    .manny-click:hover { color: #0056b3; }
+    
+    /* Стили всплывающего модального окна */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: white; color: #333; padding: 25px; border-radius: 8px; width: 100%; max-width: 350px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .modal-content h3 { margin-top: 0; color: var(--card); }
+    .form-group { margin: 15px 0; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  </style>
 </head>
 <body>
 
-<div class="header">
-    <h2>👑 Панель Администратора (Суперпользователь)</h2>
-    <div>
-        <a href="/dashboard.html" class="btn-nav">В личный кабинет</a>
-    </div>
-</div>
-
 <div class="container">
-    <!-- Блок пользователей -->
-    <div class="card">
-        <h3>👤 Зарегистрированные пользователи</h3>
-        <div id="usersLoading" class="loading-overlay">
-            <div class="spinner"></div> Получение списка клиентов из базы данных...
-        </div>
-        <table id="usersTable" style="display: none;">
-            <thead>
-                <tr>
-                    <th>Логин</th>
-                    <th>Email адрес</th>
-                    <th>Дата регистрации</th>
-                </tr>
-            </thead>
-            <tbody id="usersTbody"></tbody>
-        </table>
-    </div>
+  <h2>👑 ЦЕНТРАЛЬНЫЙ ПУЛЬТ АДМИНИСТРАТОРА (ROOT)</h2>
+  <button class="btn" onclick="location.href='/dashboard.html'" style="background:#6c757d;"><- В личный кабинет</button>
 
-    <!-- Блок счетов -->
-    <div class="card">
-        <h3>💳 Управление счетами (Кликните на баланс для изменения)</h3>
-        <div id="accountsLoading" class="loading-overlay">
-            <div class="spinner"></div> Загрузка реестра счетов...
-        </div>
-        <table id="accountsTable" style="display: none;">
-            <thead>
-                <tr>
-                    <th>ID счета</th>
-                    <th>Владелец</th>
-                    <th>Баланс</th>
-                    <th>Статус</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody id="accountsTbody"></tbody>
-        </table>
-    </div>
+  <!-- Интерактивная таблица всех счетов -->
+  <table id="all-accounts-table">
+    <thead>
+      <tr>
+        <th>ID Счета</th>
+        <th>Владелец (Ник)</th>
+        <th>Деньги на счете (Клик для изменения)</th>
+        <th>2FA Защита</th>
+        <th>Статус счета</th>
+        <th>Управление статусом</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Данные подгружаются асинхронно через JS -->
+    </tbody>
+  </table>
 </div>
 
-<!-- 🔥 ДИАЛОГОВОЕ ОКНО ИЗМЕНЕНИЯ БАЛАНСА -->
-<div class="modal-backdrop" id="balanceModal">
-    <div class="modal-content">
-        <h4 id="modalTitle">Управление балансом #0</h4>
-        
-        <!-- ШАГ 1: Выбор действия (Radio input) -->
-        <div class="modal-step active" id="step1">
-            <p>Выберите действие со счетом:</p>
-            <div class="radio-group">
-                <label class="radio-label">
-                    <input type="radio" name="operationType" value="deposit" checked> 🟢 Пополнить баланс
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="operationType" value="withdraw"> 🔴 Уменьшить баланс
-                </label>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn-modal-cancel" onclick="closeModal()">Отмена</button>
-                <button class="btn-modal-next" onclick="goToStep2()">Далее</button>
-            </div>
-        </div>
-
-        <!-- ШАГ 2: Ввод суммы для увеличения/уменьшения -->
-        <div class="modal-step" id="step2">
-            <p id="step2Text">Введите сумму:</p>
-            <input type="number" id="modalAmount" placeholder="0.00" min="0.01" step="0.01">
-            <div class="modal-buttons">
-                <button class="btn-modal-cancel" onclick="goToStep1()">Назад</button>
-                <button class="btn-modal-confirm" onclick="submitBalanceChange()">Применить</button>
-            </div>
-        </div>
+<!-- Всплывающее окно тайного изменения баланса -->
+<div id="manny-modal" class="modal">
+  <div class="modal-content">
+    <h3 id="modal-title">Изменение баланса счета #0</h3>
+    <input type="hidden" id="modal-account-id">
+    
+    <div class="form-group">
+      <label for="modal-action-type">Выберите действие:</label>
+      <select id="modal-action-type">
+        <option value="add">Увеличить баланс (+)</option>
+        <option value="remove">Уменьшить баланс (-)</option>
+      </select>
     </div>
+    
+    <div class="form-group">
+      <label for="modal-amount">Сумма операции (руб):</label>
+      <input type="number" id="modal-amount" placeholder="0.00" step="0.01" min="0.01">
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn" style="background: #6c757d;" onclick="closeMannyModal()">Отмена</button>
+      <button class="btn btn-unban" onclick="submitMannyModification()">Применить тайное изменение</button>
+    </div>
+  </div>
 </div>
 
 <script>
-    let currentTargetAccountId = null;
-    let selectedOperation = 'deposit';
+  // Загрузка таблицы при старте страницы
+  async function loadAdminDashboard() {
+    try {
+      const response = await fetch('/api/admin/accounts/all');
+      const result = await response.json();
 
-    async function initAdminPanel() {
-        try {
-            showLoading(true);
+      if (!response.ok || !result.status) {
+        alert("Отказано в доступе или ошибка БД!");
+        window.location.href = '/dashboard.html';
+        return;
+      }
 
-            const [usersRes, accountsRes] = await Promise.all([
-                fetch('/api/admin/users'),
-                fetch('/api/admin/accounts')
-            ]);
+      const tbody = document.querySelector('#all-accounts-table tbody');
+      tbody.innerHTML = "";
 
-            if (usersRes.status === 401 || usersRes.status === 403) {
-                alert('Доступ запрещен! Вы не вошли как root.');
-                window.location.href = '/index.html';
-                return;
-            }
+      result.accounts.forEach(acc => {
+        // Логика кнопки блокировки: если активен — показываем "Заблокировать", иначе "Разблокировать"
+        const statusText = acc.active ? '<span style="color:green; font-weight:bold;">Разблокирован</span>' : '<span style="color:red; font-weight:bold;">Заблокирован</span>';
+        const actionButton = acc.active 
+          ? `<button class="btn btn-ban" onclick="toggleAccountStatus(${acc.id}, false)">🚫 Заблокировать</button>`
+          : `<button class="btn btn-unban" onclick="toggleAccountStatus(${acc.id}, true)">✅ Разблокировать</button>`;
 
-            const usersData = await usersRes.json();
-            const accountsData = await accountsRes.json();
-
-            renderUsers(usersData.users);
-            renderAccounts(accountsData.accounts);
-
-            showLoading(false);
-
-        } catch (err) {
-            console.error('Ошибка панели управления:', err);
-            showLoading(false);
-        }
+        tbody.innerHTML += `
+          <tr>
+            <td>#${acc.id}</td>
+            <td><b>${acc.user}</b></td>
+            <td><span class="manny-click" onclick="openMannyModal(${acc.id}, ${acc.manny})">${parseFloat(acc.manny).toFixed(2)} руб.</span></td>
+            <td>${acc.two_fa_status ? '🔒 Включена' : '❌ Отключена'}</td>
+            <td>${statusText}</td>
+            <td>${actionButton}</td>
+          </tr>
+        `;
+      });
+    } catch (e) {
+      console.error(e);
     }
+  }
 
-    function showLoading(isLoading) {
-        const usersLoader = document.getElementById('usersLoading');
-        const accountsLoader = document.getElementById('accountsLoading');
-        const usersTable = document.getElementById('usersTable');
-        const accountsTable = document.getElementById('accountsTable');
-
-        if (isLoading) {
-            usersLoader.style.display = 'flex';
-            accountsLoader.style.display = 'flex';
-            usersTable.style.display = 'none';
-            accountsTable.style.display = 'none';
-        } else {
-            usersLoader.style.display = 'none';
-            accountsLoader.style.display = 'none';
-            usersTable.style.display = 'table';
-            accountsTable.style.display = 'table';
-        }
+  // Переключение статуса бана/разбана
+  async function toggleAccountStatus(accountId, makeActive) {
+    try {
+      const response = await fetch(`/api/admin/accounts/${accountId}/status`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ active: makeActive })
+      });
+      const data = await response.json();
+      if (data.status) {
+        loadAdminDashboard(); // Перерисовываем таблицу
+      } else {
+        alert("Не удалось изменить статус счета.");
+      }
+    } catch(err) {
+      console.error(err);
     }
+  }
 
-    function renderUsers(users) {
-        const tbody = document.getElementById('usersTbody');
-        tbody.innerHTML = '';
-        if (!users || !Array.isArray(users)) return;
+  // Управление модальным окном изменения денег
+  function openMannyModal(accountId, currentManny) {
+    document.getElementById('modal-account-id').value = accountId;
+    document.getElementById('modal-title').innerText = `Счет #${accountId} (Текущий: ${parseFloat(currentManny).toFixed(2)} руб.)`;
+    document.getElementById('modal-amount').value = "";
+    document.getElementById('manny-modal').style.display = 'flex';
+  }
 
-        users.forEach(u => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${u.user_name}</strong></td>
-                <td>${u.gmail || '—'}</td>
-                <td>${new Date(u.createdAt).toLocaleString()}</td>
-            `;
-            tbody.appendChild(tr);
-        });
+  function closeMannyModal() {
+    document.getElementById('manny-modal').style.display = 'none';
+  }
+
+  // Отправка запроса на тайное изменение баланса (БЕЗ уведомления пользователя)
+  async function submitMannyModification() {
+    const accountId = document.getElementById('modal-account-id').value;
+    const amount = document.getElementById('modal-amount').value;
+    const type = document.getElementById('modal-action-type').value;
+
+    if (!amount || parseFloat(amount) <= 0) {
+      alert("Введите корректную сумму!");
+      return;
     }
-
-     function renderAccounts(accounts) {
-        const tbody = document.getElementById('accountsTbody');
-        tbody.innerHTML = '';
-        
-        if (!accounts || !Array.isArray(accounts) || accounts.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">Счета отсутствуют.</td></tr>`;
-            return;
-        }
-
-        accounts.forEach(acc => {
-            const tr = document.createElement('tr');
-            const statusClass = acc.block_status ? 'status-frozen' : 'status-active';
-            const statusText = acc.block_status ? '❄️ ЗАМОРОЖЕН' : '▶️ АКТИВЕН';
-            
-            // Кнопка блокировки/разблокировки
-            const actionBtn = acc.block_status 
-                ? `<button class="btn-unblock" onclick="toggleBlock(${acc.id}, 'unblock')">Разморозить</button>`
-                : `<button class="btn-block" onclick="toggleBlock(${acc.id}, 'block')">Заморозить</button>`;
-
-            // Обработка бесконечного баланса для root и кликабельного для игроков
-            const isRoot = acc.user_login === 'root';
-            const balanceCell = isRoot 
-                ? `<span>∞ руб.</span>`
-                : `<span class="clickable-balance" onclick="openBalanceModal(${acc.id}, '${acc.balance}')">${parseFloat(acc.balance).toFixed(2)} руб.</span>`;
-
-            // Наводим идеальный порядок в колонках (каждый td строго на своем месте)
-            tr.innerHTML = `
-                <td># ${acc.id}</td>
-                <td><strong>${acc.user_login}</strong></td>
-                <td>${balanceCell}</td>
-                <td><span class="${statusClass}">${statusText}</span></td>
-                <td>${actionBtn}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    async function toggleBlock(accountId, action) {
-        showLoading(true);
-        const res = await fetch(`/api/accounts/${accountId}/${action}`, { method: 'POST' });
-        await res.json();initAdminPanel();
-    }
-    // =========================================================================
-    // 🔥 ЛОГИКА СИСТЕМЫ ДИАЛОГОВЫХ ОКON (МОДАЛОК) 
-    // =========================================================================
-    function openBalanceModal(accountId, currentBalance) {
-        currentTargetAccountId = accountId;
-        document.getElementById('modalTitle').innerText = `Управление балансом счета #${accountId}`;
-        document.getElementById('modalAmount').value = '';
-        goToStep1();document.getElementById('balanceModal').style.display = 'flex';
-    }
-    function closeModal() {
-        document.getElementById('balanceModal').style.display = 'none';
-    }
-    function goToStep1() {
-        document.getElementById('step2').classList.remove('active');
-        document.getElementById('step1').classList.add('active');
-    }
-    function goToStep2() {
-        // Считываем выбранную радио-кнопку
-        const radios = document.getElementsByName('operationType');
-        for (const radio of radios) {
-            if (radio.checked) {
-                selectedOperation = radio.value;
-                break;
-            }
-        }
-        // Меняем текст на втором шаге в зависимости от выбора
-        document.getElementById('step2Text').innerText = selectedOperation === 'deposit'? 'Введите сумму для НАЧИСЛЕНИЯ:': 'Введите сумму для СПИСАНИЯ:';
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step2').classList.add('active');
-    }
-    async function submitBalanceChange() {
-    const amount = document.getElementById('modalAmount').value;
-    if (!amount || parseFloat(amount) <= 0) return alert('Введите корректную сумму');
-
-    closeModal();
-    showLoading(true);
-
-    // ✅ Исправлено: Каждая ссылка обернута в свои кавычки, двоеточие стоит строго между ними
-    const url = selectedOperation === 'deposit' 
-        ? `/api/admin/accounts/${currentTargetAccountId}/deposit` 
-        : `/api/admin/accounts/${currentTargetAccountId}/withdraw`;
 
     try {
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount })
-        });
-        const data = await res.json();
-        
-        if (!data.status) {
-            alert('Ошибка операции: ' + data.message);
-        }
-        
-        // Перезагружаем панель, чтобы увидеть обновленные балансы
-        initAdminPanel();
-    } catch (err) {
-        alert('Ошибка сети');
-        showLoading(false);
-    }
-}
+      // Роут /modify работает через add-manny.js и remove-manny.js, которые НЕ шлют письма по ТЗ
+      const response = await fetch(`/api/admin/accounts/${accountId}/modify`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ amount, type })
+      });
+      const data = await response.json();
 
-    
-    initAdminPanel();
-    
+      if (data.status) {
+        closeMannyModal();
+        loadAdminDashboard(); // Обновляем данные на экране
+      } else {
+        alert("Ошибка изменения баланса: " + data.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Запуск при загрузке
+  window.onload = loadAdminDashboard;
 </script>
 </body>
 </html>

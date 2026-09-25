@@ -1,17 +1,20 @@
-const bank = require('./index.js'); // Путь к коду модуля выше
+// test.js
+const initBankModule = require('./index.js');
 
-async function main() {
+async function start() {
   try {
-    const app = bank.server.init();
+    // 🔑 ДОБАВЛЯЕМ await, чтобы получить чистый app, а не Promise
+    const app = await initBankModule(); 
+    
     const PORT = 3000;
     app.listen(PORT, () => {
-      console.log(`🚀 Модуль банка запущен вручную из главного файла на порту ${PORT}`);
+      console.log(`🚀 [City-bank] Веб-сервер успешно запущен из test.js на порту ${PORT}`);
     });
-
+    
   } catch (error) {
-    console.error("Ошибка ручного запуска проекта:", error);
+    console.error("🔴 Ошибка при запуске модуля банка:", error.message);
   }
 }
 
-main();
-
+// Запускаем нашу асинхронную функцию
+start();

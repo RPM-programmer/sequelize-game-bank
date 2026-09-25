@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>City-bank | Вход в систему</title>
+  <style>
+    body { font-family: sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 380px; }
+    h2 { text-align: center; color: #007bff; margin-top: 0; }
+    .group { margin: 15px 0; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+    input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+    .btn { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .error { color: #dc3545; font-size: 14px; margin-top: 10px; display: none; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h2>ВХОД В CITY-BANK</h2>
+  <div class="group">
+    <label for="login-name">Никнейм (Логин)</label>
+    <input type="text" id="login-name" placeholder="Введите ваш ник">
+  </div>
+  <div class="group">
+    <label for="login-pass">Пароль</label>
+    <input type="password" id="login-pass" placeholder="Введите пароль">
+  </div>
+  
+  <!-- Скрытый блок 2FA, активируемый бэкендом -->
+  <div class="group" id="totp-block" style="display: none;">
+    <label for="login-totp" style="color: #28a745;">Введите временный токен 2FA</label>
+    <input type="text" id="login-totp" placeholder="000000" style="text-align: center; font-size: 20px; letter-spacing: 2px;">
+  </div>
+
+  <div id="login-error" class="error"></div>
+  <button class="btn" onclick="submitLogin()">Войти в кабинет</button>
+  <p style="text-align: center; font-size: 14px; margin-top: 15px;"><a href="/register.html">Создать аккаунт</a></p>
+</div>
+
+<script>
+  async function submitLogin() {
+    const name = document.getElementById('login-name').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    const totp = document.getElementById('login-totp').value.trim();
+    const errBlock = document.getElementById('login-error');
+    errBlock.style.display = 'none';
+
+    try {
+      const response = await fetch('/api/users/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name, password: pass, totpCode: totp || null })
+      });
+      const result = await response.json();
+
+      if (response.ok && result.status === true) {
+        window.location.href = '/dashboard.html';
+      } else if (result.require2FA) {
+        // Сервер сообщил, что необходим ввод 2FA
+        document.getElementById('totp-block').style.display = 'block';
+        errBlock.innerText = result.message;
+        errBlock.style.display = 'block';
+      } else {
+        errBlock.innerText = result.message || "Ошибка авторизации";
+        errBlock.style.display = 'block';
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }
+</script>
+</body>
+</html>
