@@ -9,11 +9,10 @@ const fs = require('fs');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const dir = './public/uploads/avatars/';
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); // Создаем папку, если нет
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
   filename: function (req, file, cb) {
-    // Имя файла будет уникальным: ник_игрока_время.расширение
     const ext = path.extname(file.originalname);
     cb(null, `${req.user.name}_${Date.now()}${ext}`);
   }
@@ -26,7 +25,7 @@ const upload = multer({
     if (extname) return cb(null, true);
     cb(new Error('Разрешены только изображения (png, jpg, jpeg, gif)!'));
   },
-  limits: { fileSize: 2 * 1024 * 1024 } // Лимит 2 Мегабайта
+  limits: { fileSize: 2 * 1024 * 1024 } 
 });
 const usersHub = require('../database/services/users');
 const accountsHub = require('../database/services/accounts');
