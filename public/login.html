@@ -54,9 +54,8 @@
       const result = await response.json();
 
       if (response.ok && result.status === true) {
-        window.location.href = '/dashboard.html';
+        window.location.href = 'general.html';
       } else if (result.require2FA) {
-        // Сервер сообщил, что необходим ввод 2FA
         document.getElementById('totp-block').style.display = 'block';
         errBlock.innerText = result.message;
         errBlock.style.display = 'block';

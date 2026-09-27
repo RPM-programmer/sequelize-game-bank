@@ -1,246 +1,164 @@
-> # chalk-palette 🎨
+# chalk-palette
 
-[<img src="https://img.icons8.ru/?size=100&id=24895&format=png&color=000000" height="60" align="center"> npm versions](https://www.npmjs.com/package/chalk-palette?activeTab=versions)
-[<img src="https://img.icons8.ru/?size=100&id=24895&format=png&color=000000" height="60" align="center"> На npm](https://www.npmjs.com/package/chalk-palette)
-[<img src="https://img.icons8.ru/?size=100&id=12599&format=png&color=000000" height="60" align="center"> На GitHub](https://github.com/RPM-programmer/chalk-palette)
-[<img src="https://img.icons8.ru/?size=100&id=dvsOEzqniDma&format=png&color=000000" height="60" align="center"> License](LICENSE)
+<p align="left">
+  <b>English</b> | <a href="./README.ru.md">Русский</a>
+</p>
 
-[English](#english-documentation) | [Русское описание](#русская-документация)
+---
+> **chalk-palette** is an ultra-lightweight Node.js library that transforms dull, monochrome terminal text into a vibrant, interactive interface. It supports over 140 colors, gradients, and full-fledged visual effects (VFX) like "Matrix" or "Fire."
+
 
 ---
 
-## 🎭 Live Showcase / Демонстрация работы
-![Chalk Palette Showcase](./assets/demo.gif)
+## 🛠️ Installation
 
----
-
-## English Documentation
-
-A secure, lightweight, and supercharged alternative to `chalk` with **140+ built-in colors**, TypeScript autocomplete support, and a powerful **cross-platform animation engine**.
-
-Works flawlessly across **Linux**, **macOS**, and **Windows** (including legacy CMD).
-
-### 📦 Installation
+Simply install the package via your package manager:
 
 ```bash
 npm install chalk-palette
-# or
-yarn add chalk-palette
-```
-
-### 💻 Quick Start
-
-<details>
-<summary><b>CommonJS (Node.js / require)</b></summary>
-
-```javascript
-const chalk = require('chalk-palette');
-
-// 1. Standard Colors (PascalCase)
-console.log(chalk.Red("This is red text"));
-console.log(chalk.DeepSkyBlue("Beautiful sky blue text"));
-
-// 2. Backgrounds
-console.log(chalk.bgTomato("Tomato background text"));
-
-// 3. System Styles (lowercase)
-console.log(chalk.bold("Bold text"));
-console.log(chalk.underline("Underlined text"));
-
-// 4. Clickable Links (Auto-detection)
-chalk.customise("Visit our repository at https://github.com");
-```
-</details>
-
-<details>
-<summary><b>ES Modules / TypeScript (import)</b></summary>
-
-```typescript
-import chalk from 'chalk-palette';
-
-// 1. Standard Colors (PascalCase)
-console.log(chalk.Red("This is red text"));
-console.log(chalk.DeepSkyBlue("Beautiful sky blue text"));
-
-// 2. Backgrounds
-console.log(chalk.bgTomato("Tomato background text"));
-
-// 3. System Styles (lowercase)
-console.log(chalk.bold("Bold text"));
-console.log(chalk.underline("Underlined text"));
-
-// 4. Clickable Links (Auto-detection)
-chalk.customise("Visit our repository at https://github.com");
-```
-</details>
-
-### 🎭 Animation & CLI Tools (`chalk.animation`)
-
-#### 1. Live Text Effects
-* **`rainbow(text, speed)`** — Smooth color-shifting wave across the text string. Supports emojis without breaking characters!
-  ```javascript
-  const rainbow = chalk.animation.rainbow("Live moving rainbow wave! 🌈", 50);
-  setTimeout(() => rainbow.stop(), 5000); // Stop after 5 seconds
-  ```
-* **`typewriter(text, speed)`** — Prints text character by character with an adjustable typing delay.
-  ```javascript
-  await chalk.animation.typewriter("Initializing secured terminal interface...", 40);
-  ```
-* **`gradient(text, colorFrom, colorTo)`** — Generates a static, non-animated smooth color blend between any two palette colors. Great for app banners.
-  ```javascript
-  const banner = chalk.animation.gradient("=== MY SUPER CLI ===", "DeepSkyBlue", "DeepPink");
-  console.log(banner);
-  ```
-
-#### 2. Full-Screen Visuals (Alternate Buffer Safe)
-*These effects temporary switch the terminal screen, run the animation, and restore your logs perfectly upon exit.*
-* **`matrix(duration, colorName)`** — The iconic falling character effect. Supports 5 color modes: `'green'`, `'blue'`, `'yellow'`, `'red'`, and a textured `'orange'` fire mode.
-  ```javascript
-  await chalk.animation.matrix(3000, 'blue'); // Runs blue matrix rain for 3 seconds
-  ```
-* **`fire(duration)`** — A procedural, fully animated fire simulator rendering live flames right in your CLI.
-  ```javascript
-  await chalk.animation.fire(4500);
-  ```
-* **`glitch(text, duration)`** — Cyberpunk terminal error screen with shaky, shifting characters.
-* **`pulse(text, duration)`** — Cinematic fading and glowing breathing text inside pitch darkness.
-
-#### 3. Smart UI Tools
-* **`progressBar(totalSteps)`** — Draws a beautifully filling progress bar that automatically scales to the width of the user's terminal window and transitions from hot-red to bright-green.
-  ```javascript
-  const bar = chalk.animation.progressBar(100);
-  for (let i = 0; i <= 100; i++) {
-      bar.update(i);
-      await new Promise(r => setTimeout(r, 20));
-  }
-  ```
-* **`passwordMask(question, maskChar)`** — Puts terminal into raw-mode to capture keyboard inputs safely. Masks letters into custom bullets while perfectly processing `Backspace`, `Enter`, and emergency abort via `Ctrl+C`.
-  ```javascript
-  const token = await chalk.animation.passwordMask("Enter your API Token: ", "•");
-  ```
-
----
-
-## Русская Документация
-
-Безопасная, легкая и расширенная альтернатива пакету `chalk` с **более чем 140 встроенными цветами**, поддержкой автодополнения в TypeScript/IDE и мощным **кроссплатформенным движком анимации**.
-
-Идеально работает на **Linux**, **macOS** и **Windows** (включая классический CMD).
-
-### 📦 Установка
-
-```bash
-npm install chalk-palette
-# or
-yarn add chalk-palette
-```
-
-### 💻 Быстрый старт
-
-<details>
-<summary><b>CommonJS (Node.js / require)</b></summary>
-
-```javascript
-const chalk = require('chalk-palette');
-
-// 1. Стандартные цвета (PascalCase)
-console.log(chalk.Red("Это красный текст"));
-console.log(chalk.DeepSkyBlue("Красивый небесно-синий текст"));
-
-// 2. Фон для текста
-console.log(chalk.bgTomato("Текст с томатным фоном"));
-
-// 3. Системные стили (строчные буквы)
-console.log(chalk.bold("Жирный текст"));
-console.log(chalk.underline("Подчеркнутый текст"));
-
-// 4. Кликабельные ссылки (Автоматическое определение)
-chalk.customise("Посетите наш репозиторий: https://github.com");
-```
-</details>
-
-<details>
-<summary><b>ES Modules / TypeScript (import)</b></summary>
-
-```typescript
-import chalk from 'chalk-palette';
-
-// 1. Стандартные цвета (PascalCase)
-console.log(chalk.Red("Это красный текст"));
-console.log(chalk.DeepSkyBlue("Красивый небесно-синий текст"));
-
-// 2. Фон для текста
-console.log(chalk.bgTomato("Текст с томатным фоном"));
-
-// 3. Системные стили (строчные буквы)
-console.log(chalk.bold("Жирный текст"));
-console.log(chalk.underline("Подчеркнутый текст"));
-
-// 4. Кликабельные ссылки (Автоматическое определение)
-chalk.customise("Посетите наш репозиторий: https://github.com");
-```
-</details>
-
-
-
-### 🎭 Анимации и CLI-инструменты (`chalk.animation`)
-
-#### 1. Живые текстовые эффекты
-* **`rainbow(text, speed)`** — Плавная бегущая радужная волна по строке. Корректно обрабатывает эмодзи и не ломает символы!
-  ```javascript
-  const rainbow = chalk.animation.rainbow("Живая бегущая радуга! 🌈", 50);
-  setTimeout(() => rainbow.stop(), 5000); // Остановить через 5 секунд
-  ```
-* **`typewriter(text, speed)`** — Эффект печатной машинки, выводящий текст посимвольно с настраиваемой задержкой.
-  ```javascript
-  await chalk.animation.typewriter("Инициализация защищенного интерфейса...", 40);
-  ```
-* **`gradient(text, colorFrom, colorTo)`** — Генерирует статичное, не анимированное плавное переливание между любыми двумя цветами палитры. Отлично подходит для стартовых баннеров приложений.
-  ```javascript
-  const banner = chalk.animation.gradient("=== МОЙ СКРИПТ ===", "DeepSkyBlue", "DeepPink");
-  console.log(banner);
-  ```
-
-#### 2. Полноэкранные визуальные эффекты (Безопасны для логов)
-*Эти эффекты временно переключают экран терминала (альтернативный буфер), запускают анимацию и полностью восстанавливают ваши старые логи при выходе.*
-* **`matrix(duration, colorName)`** — Культовый цифровой дождь. Поддерживает 5 цветов: `'green'`, `'blue'`, `'yellow'`, `'red'`, а также текстурный оранжевый режим огня `'orange'`.
-  ```javascript
-  await chalk.animation.matrix(3000, 'blue'); // Синяя матрица на 3 секунды
-  ```
-* **`fire(duration)`** — Процедурный симулятор пламени, генерирующий живой ASCII-огонь прямо в консоли.
-  ```javascript
-  await chalk.animation.fire(4500);
-  ```
-* **`glitch(text, duration)`** — Эффект цифрового сбоя (киберпанк) с дрожащими и хаотично меняющимися символами.
-* **`pulse(text, duration)`** — Плавное появление и затухание («дыхание») текста в полной темноте.
-
-#### 3. Умные UI-инструменты
-* **`progressBar(totalSteps)`** — Прогресс-бар, который автоматически масштабируется под физическую ширину окна терминала и плавно меняет цвет от тревожного красного к салатово-зеленому.
-  ```javascript
-  const bar = chalk.animation.progressBar(100);
-  for (let i = 0; i <= 100; i++) {
-      bar.update(i);
-      await new Promise(r => setTimeout(r, 20));
-  }
-  ```
-* **`passwordMask(question, maskChar)`** — Переводит терминал в raw-режим для безопасного перехвата ввода. Превращает буквы в кастомные маркеры (например, точки), корректно обрабатывая `Backspace`, `Enter` и экстренный выход по `Ctrl+C`.
-  ```javascript
-  const token = await chalk.animation.passwordMask("Введите ваш API токен: ", "•");
-  ```
-
----
-
-## 🛠 Advanced / Кастомизация
-
-You can dynamically set a temporary RGB state using `setCustomColor` / Вы можете динамически задать кастомный RGB-цвет:
-
-```javascript
-chalk.setCustomColor(142, 68, 173);
-console.log(chalk.custom("Custom colored text"));
 ```
 
 ---
 
-## 📜 License / Лицензия
+## 📖 API Reference
 
-MIT © [prm-programmer](https://github.com)
+The library is divided into two parts: basic methods (available directly via `chalk`) and animated methods (available via `chalk.animation`).
+
+---
+
+### 🎨 1. Basic Styling Methods
+
+#### `chalk.[ColorName](text)` / `chalk.[style].[ColorName](text)`
+* **What it does:** Colors text or applies styles to it within a single line.
+* **Arguments:** `text` (String) — the text to be colored.
+* **Palette:** Over 140 colors available (case-insensitive; e.g., `Red`, `red`, `Tomato`, `tomato`).
+* **Example:** `chalk.bold.italic.Tomato("Hello")`
+
+#### `chalk.setCustomColor(r, g, b)`
+* **What it does:** Saves a custom color to the library's memory.
+* **Arguments:** `r`, `g`, `b` (Numbers) — values ​​from 0 to 255.
+* **Returns:** Nothing. The result is output using the next method.
+* **Example:**
+```javascript
+chalk.setCustomColor(255, 128, 0); // Saved orange
+console.log(chalk.custom("This text will be orange"));
+```
+
+#### `chalk.customise(text)`
+* **What it does:** Finds links in the text and turns them into clickable terminal hyperlinks. Punctuation marks surrounding the links remain intact.
+* **Arguments:** `text` (String) — the string containing text and links.
+* **What it returns:** A formatted string (String) and automatically outputs it via `console.log`.
+
+---
+
+### 🎬 2. Animations and UI elements (`chalk.animation.*`)
+
+> 💡 **Important:** Most animations return a `Promise`. Use `await` to ensure effects play sequentially.
+
+#### `.gradient(text, colorFrom, colorTo)`
+* **What it does:** Colors the text with a smooth TrueColor gradient. Each character gets its own shade.
+* **Arguments:**
+* `text` (String) — the source text. 
+* `colorFrom`, `colorTo` (String) — names of the start and end colors from the palette (e.g., `'Red'`, `'Blue'`).
+* **What it returns:** A string (String) containing ANSI codes. Does **not** return a Promise; output via `console.log`.
+
+#### `.typewriter(text, speed)`
+* **What it does:** Prints text to the screen character by character, simulating manual typing.
+* **Arguments:**
+* `text` (String) — the text to output. 
+* `speed` (Number) — delay in milliseconds between characters (default: `50`).
+* **What it returns:** `Promise<void>`.
+
+#### `.rainbow(text, speed)`
+* **What it does:** Starts an infinite loop where the text cycles through all the colors of the rainbow in place.
+* **Arguments:**
+* `text` (String) — the text. 
+* `speed` (Number) — the color-changing speed in ms (default: `50`).
+* **Returns:** An object with a control method: `{ stop: () => void }`.
+* **Example:**
+```javascript
+const fx = chalk.animation.rainbow("Text"); 
+setTimeout(() => fx.stop(), 3000); // Stops the rainbow after 3 seconds
+```
+
+#### `.spinner(text, style)`
+* **Function:** Creates an animated spinner (loading indicator) at the beginning of the line.
+* **Arguments:**
+* `text` (String) — the text next to the spinner. 
+* `style` (String) — the animation style (`'dots'`, `'line'`, `'arrows'`).
+* **Returns:** A control object: `{ stop: (finalStatus) => void }`. The `.stop()` method stops the animation, removes the spinner, displays a green checkmark, and outputs the final status.
+
+#### `.progressBar(totalSteps)`
+* **Function:** Renders a progress bar that automatically changes color from red (at the start) to green (at the end).
+* **Arguments:** `totalSteps` (Number) — the maximum number of steps (e.g., `100`).
+* **Returns:** A control object: `{ update: (currentStep) => void }`. The `.update()` method accepts the current step and redraws the bar.
+
+#### `.passwordMask(question, maskChar)`
+* **Function:** Masks user keyboard input with asterisks (or any other character).
+* **Arguments:**
+* `question` (String) — the prompt text (e.g., `"Enter password: "`). * `maskChar` (String) — the mask character (default: `*`).
+* **Returns:** `Promise<string>` — returns the raw string entered by the user.
+
+---
+
+### 🖥️ 3. Full-screen visual effects (VFX)
+
+> ⚠️ **Screen behavior:** All functions below automatically render the animation on an alternate terminal screen. Upon completion, they clear the animation and restore your console to its original state without cluttering the log history.
+
+#### `.textAssemble(text, duration)`
+* **What it does:** Scatters letters across the screen, then smoothly draws them toward the center to assemble the final word.
+* **Arguments:** `text` (String), `duration` (Number, in ms; default: `4500`).
+* **Returns:** `Promise<void>`.
+
+#### `.textLaser(text, duration)`
+* **What it does:** Draws a moving laser beam that behind scorched, colored text characters.
+* **Arguments:** `text` (String), `duration` (Number, in ms, default `2500`).
+* **Returns:** `Promise<void>`.
+
+#### `.textShimmer(text, duration)`
+* **Action:** Displays the text with a bright light wave (glint) sweeping across it from left to right.
+* **Arguments:** `text` (String), `duration` (Number, in ms, default `2000`).
+* **Returns:** `Promise<void>`.
+
+#### `.textMorph(textFrom, textTo, duration)`
+* **Action:** Takes the first word, performs a chaotic dance of its characters, and smoothly transforms it into the second word.
+* **Arguments:** `textFrom` (String), `textTo` (String), `duration` (Number, in ms, default `3800`).
+* **Returns:** `Promise<void>`.
+
+#### `.matrix(duration, colorName)`
+* **Action:** A full-screen "digital rain" effect featuring characters in the style of *The Matrix* movie.
+* **Arguments:**
+* `duration` (Number, in ms, default `5000`). 
+* `colorName` (String) — the color of the rain (`'green'`, `'orange'`, `'blue'`, `'yellow'`, `'red'`).
+* **Returns:** `Promise<void>`.
+
+#### `.fire(duration)`
+* **Action:** A full-screen procedural generator of raging flames based on heat distribution physics.
+* **Arguments:** `duration` (Number, in ms, default `5000`).
+* **Returns:** `Promise<void>`. #### `.glitch(text, duration)`
+* **What it does:** Centers the text, makes it shake violently horizontally, and replaces some characters with hacker-style glyphs.
+* **Arguments:** `text` (String), `duration` (Number, in ms, default `3000`).
+* **Returns:** `Promise<void>`.
+
+#### `.pulse(text, duration)`
+* **What it does:** Centers the text on the screen and makes it smoothly fade in and out following a sinusoidal pattern.
+* **Arguments:** `text` (String), `duration` (Number, in ms, default `4000`).
+* **Returns:** `Promise<void>`.
+
+#### `.textExplode(text, config)`
+* **What it does:** Types out the text, highlights the central character (the "C4 charge"), pulses, and then explodes the string, creating a circular shockwave and scattering ash.
+* **Arguments:**
+* `text` (String) — the text. 
+* `config` (Object) — explosion parameters: `{ type: 'c4'|'nuke'|'torpedo', duration: 3000, c4Color: 'red' }`.
+* **Returns:** `Promise<void>`.
+
+## 📄 License
+
+This project is distributed under the **MIT** license. You are free to use it for any personal or commercial purpose.
+
+---
+
+## 👤 Author
+
+* **prm-programmer** — [GitHub](https://github.com/RPM-programmer)
+* **Code** — [GitHub](https://github.com/RPM-programmer/chalk-palette) [Npm]()

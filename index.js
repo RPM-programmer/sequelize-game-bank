@@ -11,6 +11,7 @@ const { writeTemplatesIfNotExist } = require('./database/services/bot/write');
 const registerRoutes = require('./server/server');
 const Transaction = require('./database/models/Transaction'); 
 const app = express();
+const path = require("path")
 
 app.use(express.json());
 app.use(cookieParser());
@@ -42,10 +43,38 @@ async function initBankModule() {
     console.log(logger.ServerBankInfo(`Супер пользвотель создан`))
 
     const configuredApp = registerRoutes(app);
-    configuredApp.use(express.static('public'));
+
+// 1. Открытые папки со стилями, скриптами фронтенда и стандартными картинками
+// (Файлы должны лежать в public/css, public/js и т.д.)
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// Импортируем middleware проверки сессии (вынесем его в доступное место)
+const { verifySession } = require('./server/middleware/auth');
+
+// 2. Защищенные HTML-страницы личного кабинета (файлы лежат в private/ или public/dashboard/)
+const pages = ['general.html', 'profile.html', 'accounts.html', 'transfer.html', 'history.html', 'credit.html'];
+
+pages.forEach(page => {
+  app.get(`/${page}`, verifySession, (req, res) => {
+    // Отдаем файл только если кука JWT прошла валидацию
+    res.sendFile(path.join(__dirname, 'public', page));
+  });
+});
+
+// 3. Открытые страницы, доступные БЕЗ авторизации
+app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
+
+// Перенаправление с главного адреса на главную страницу банка
+app.get('/', verifySession, (req, res) => res.redirect('/general.html'));
+
+// ... (остальной код возврата configuredApp)
+
     return configuredApp;
   } catch (err) {
-    console.log(logger.ServerBankError("[-100] Критическая ошибка инициализации модулей"));
+    console.log(logger.ServerBankError("[-100] Критическая ошибка инициализации модулей", err));
     throw err;
   }
 }

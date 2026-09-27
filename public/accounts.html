@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>City-Bank | Мои Счета</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="main-container">
+      <div class="sidebar">
+      <div style="text-align: center; margin-bottom: 15px;">
+        <img id="user-avatar" src="/uploads/avatars/default.png" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #1abc9c;">
+      </div>
+      <h2 id="user-display">Загрузка...</h2>
+      <p style="text-align: center; color: #bbb;">Всего средств: <span id="total-manny" style="font-weight: bold; color: #1abc9c;">0.00</span> руб.</p>
+      <hr style="border-color: #34495e;">
+      <a href="/general.html" class="nav-item"><button class="menu-btn">Главная</button></a>
+      <a href="/accounts.html" class="nav-item"><button class="menu-btn active">Мои Счета</button></a>
+      <a href="/transfer.html" class="nav-item"><button class="menu-btn">Перевод средств</button></a>
+      <a href="/history.html" class="nav-item"><button class="menu-btn">История транзакций</button></a>
+      <a href="/credit.html" class="nav-item"><button class="menu-btn">Оформить Кредит</button></a>
+      <a href="/profile.html" class="nav-item"><button class="menu-btn">Управление профилем</button></a>
+      <button class="menu-btn" style="display: none; color: #ffc107;">Админ-панель</button>
+      <br><br>
+      <button class="menu-btn btn-danger" id="logoutBtn" style="text-align: center;">Выйти из системы</button>
+    </div>
+    <div class="container">
+      <div class="container-center">
+        <h3>Ваши активные банковские счета</h3>
+        <div class="card">
+          <button class="btn" onclick="openCreateAccountModal()">+ Открыть новый счет (0.00 руб)</button>
+          <table id="table-accounts">
+            <thead><tr><th>ID Счета</th><th>Баланс</th><th>2FA Защита</th><th>Статус</th><th>Действие</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="/js/js.js"></script>
+</body>
+</html>

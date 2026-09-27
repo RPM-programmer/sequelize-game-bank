@@ -164,34 +164,49 @@ interface BaseChalkMethods {
   bgPurple(): ChalkInstance;
   bgWhite(): ChalkInstance;
   bgBlack(): ChalkInstance;
+
+  /** Use your custom RGB color / Использовать свой RGB цвет */
   custom(): ChalkInstance;
 }
+
 declare class AnimationInstance {
+  /** Rainbow scrolling text / Бегущая радужная строка */
   rainbow(text: string, speed?: number): { stop(): void };
+  /** Typewriter simulation / Имитация печатной машинки */
   typewriter(text: string, speed?: number): Promise<void>;
+  /** Matrix digital rain / Цифровой дождь Матрицы */
   matrix(duration?: number): Promise<void>;
+  /** Terminal text glitch / Хакерское искажение текста */
   glitch(text: string, duration?: number): Promise<void>;
+  /** Smooth text fading / Синусоидальная пульсация текста */
   pulse(text: string, duration?: number): Promise<void>;
+  /** Full-screen procedurial fire / Полноэкранный процедурный огонь */
   fire(duration?: number): Promise<void>;
+  /** Matrix rain with custom color / Дождь Матрицы с выбором цвета */
   matrix(duration?: number, colorName?: 'green' | 'orange' | 'blue' | 'yellow' | 'red'): Promise<void>;
+  /** Mask password inputs / Скрывать ввод пароля за звездочками */
   passwordMask(question?: string, maskChar?: string): Promise<string>;
+  /** Dynamic visual progress bar / Цветной индикатор выполнения */
   progressBar(totalSteps?: number): { update(currentStep: number): void };
+  /** TrueColor smooth gradient / Плавный 24-битный градиент */
   gradient(text: string, colorFrom: string, colorTo: string): string;
+  /** Animated loading indicator / Анимированная крутилка загрузки */
   spinner(text?: string, style?: 'dots' | 'line' | 'arrows'): { stop(finalStatus?: string): void };
 }
+
 type InvertCase<T extends string> = T extends `${infer F}${infer R}`
-  ? F extends Capitalize<F>
-    ? `${Uncapitalize<F>}${R}`
-    : `${Capitalize<F>}${R}`
-  : T;
-type InvertedMethods = {
-  [K in keyof BaseChalkMethods as InvertCase<Extract<K, string>>]: BaseChalkMethods[K];
-};
+  ? F extends Capitalize<F> ? `${Uncapitalize<F>}${R}` : `${Capitalize<F>}${R}` : T;
+
+type InvertedMethods = { [K in keyof BaseChalkMethods as InvertCase<Extract<K, string>>]: BaseChalkMethods[K]; };
+
 interface ChalkCallable {
   (text?: string): ChalkInstance | string;
+  /** Set your custom RGB values / Задать свои значения RGB */
   setCustomColor(red: number, green: number, blue: number): void;
 }
-export type ChalkInstance = ChalkCallable & BaseChalkMethods & InvertedMethods & {
+
+// Убираем слово export отсюда, оставляем просто определение типа
+type ChalkInstance = ChalkCallable & BaseChalkMethods & InvertedMethods & {
   customise(str: string): string;
   animation: AnimationInstance;
 };

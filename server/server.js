@@ -114,17 +114,12 @@ module.exports = function registerRoutes(app) {
   app.post('/api/users/login', async (req, res) => {
     const { name, password, totpCode } = req.body;
     const result = await usersHub.login(name, password, totpCode);
-    
     if (!result.status) {
-      // Если это сигнал о необходимости ввода 2FA (код -2)
       if (result.require2FA) {
         return res.status(200).json(result); 
       }
-      // Обычная ошибка (неверный пароль и т.д.)
       return res.status(401).json(result);
     }
-
-    // Если всё успешно, генерируем сессионную куку JWT
     const sessionToken = jwt.sign({ name: name }, process.env.JWT_SECRET, { expiresIn: '2h' });
     res.cookie('token', sessionToken, { httpOnly: true, maxAge: 2 * 60 * 60 * 1000 });
     
