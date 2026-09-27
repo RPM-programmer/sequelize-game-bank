@@ -12,9 +12,10 @@ const registerRoutes = require('./server/server');
 const Transaction = require('./database/models/Transaction'); 
 const app = express();
 const path = require("path")
-
+const { verifySession } = require('./server/server');
 app.use(express.json());
 app.use(cookieParser());
+
 
 
 async function initBankModule() {
@@ -50,18 +51,17 @@ app.use('/css', express.static(path.join(__dirname, 'public/css')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-// Импортируем middleware проверки сессии (вынесем его в доступное место)
-const { verifySession } = require('./server/middleware/auth');
+const { verifyPageSession } = require('./server/middleware/auth');
 
-// 2. Защищенные HTML-страницы личного кабинета (файлы лежат в private/ или public/dashboard/)
 const pages = ['general.html', 'profile.html', 'accounts.html', 'transfer.html', 'history.html', 'credit.html'];
 
 pages.forEach(page => {
-  app.get(`/${page}`, verifySession, (req, res) => {
-    // Отдаем файл только если кука JWT прошла валидацию
+  // Защита страниц: при переходе между ними вылетов не будет
+  app.get(`/${page}`, verifyPageSession, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', page));
   });
 });
+
 
 // 3. Открытые страницы, доступные БЕЗ авторизации
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));

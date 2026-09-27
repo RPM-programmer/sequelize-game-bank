@@ -1,27 +1,34 @@
 const jwt = require('jsonwebtoken');
 
-function verifySession(req, res, next) {
+// 📋 МИДЛВАРЬ ДЛЯ СТРАНИЦ (.html): Если не авторизован — жёстко перенаправляет на вход
+function verifyPageSession(req, res, next) {
   const token = req.cookies.token;
-
   if (!token) {
-    // 🔑 КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Если это запрос страницы — редиректом отправляем на логин,
-    // если это запрос к API (fetch) — отдаем json со статус-кодом 401
-    if (req.headers.accept && req.headers.accept.includes('text/html')) {
-      return res.redirect('/login.html');
-    }
-    return res.status(401).json({ status: false, message: 'Не авторизован' });
+    return res.redirect('/login.html');
   }
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; 
+    req.user = decoded;
     next();
   } catch (err) {
-    if (req.headers.accept && req.headers.accept.includes('text/html')) {
-      return res.redirect('/login.html');
-    }
-    return res.status(403).json({ status: false, message: 'Сессия устарела' });
+    res.clearCookie('token');
+    return res.redirect('/login.html');
   }
 }
 
-module.exports = { verifySession };
+// 🌐 МИДЛВАРЬ ДЛЯ API (/api/*): Никогда не делает редирект, отдаёт только понятный JSON
+function verifyApiSession(req, res, next) {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ status: false, statusCode: -2, message: 'Сессия отсутствует.' });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(403).json({ status: false, statusCode: -2, message: 'Сессия устарела. Войдите снова.' });
+  }
+}
+
+module.exports = { verifyPageSession, verifyApiSession };

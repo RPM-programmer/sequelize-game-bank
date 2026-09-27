@@ -1,0 +1,14 @@
+
+------------------------------[ 27.09.2026, 18:54:32 ]------------------------------
+TYPE: UNCAUGHT_EXCEPTION
+MESSAGE: Cannot find module './middleware/auth'
+Require stack:
+- /home/pl/Desktop/sequelize-game-bank/index.js
+- /home/pl/Desktop/sequelize-game-bank/test.js
+STACK:
+Error: Cannot find module './middleware/auth'
+Require stack:
+- /home/pl/Desktop/sequelize-game-bank/index.js
+- /home/pl/Desktop/sequelize-game-bank/test.js
+    at Object.<anonymous> (/home/pl/Desktop/sequelize-game-bank/index.js:7:30)
+----------------------------------------------------------------------

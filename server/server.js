@@ -232,3 +232,4 @@ module.exports = function registerRoutes(app) {
 
   return app;
 };
+module.exports.verifySession = verifySession;

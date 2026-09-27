@@ -7,10 +7,17 @@
     event.target.classList.add('active');
   }
 
-    async function loadData() {
+  async function loadData() {
     try {
       // 1. Получаем инфо о пользователе и его счетах
       let response = await fetch('/api/accounts/my');
+      
+      // Защита: если сервер вернул ошибку сессии (401/403), сразу уходим на логин
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = '/login.html';
+        return;
+      }
+      
       let result = await response.json();
       
       // Запрашиваем баланс и имя текущего игрока
@@ -18,57 +25,78 @@
       let mannyData = await mannyRes.json();
       
       currentUsername = mannyData.username;
-      document.getElementById('user-display').innerText = currentUsername.toUpperCase();
-      document.getElementById('total-manny').innerText = mannyData.totalManny.toFixed(2);
+      
+      // Безопасное заполнение шапки профиля (если элементы есть)
+      const userDisplay = document.getElementById('user-display');
+      if (userDisplay) userDisplay.innerText = currentUsername.toUpperCase();
+      
+      const totalManny = document.getElementById('total-manny');
+      if (totalManny) totalManny.innerText = mannyData.totalManny.toFixed(2);
 
-      // 👑 СТРОГАЯ ПРОВЕРКА ДЛЯ АДМИН-ПАНЕЛИ
+      // ПРОВЕРКА ДЛЯ АДМИН-ПАНЕЛИ
       const adminNavButton = document.getElementById('admin-nav');
       if (adminNavButton) {
         if (currentUsername === 'root') {
-          adminNavButton.style.display = 'block'; // Показываем ТОЛЬКО админу root
+          adminNavButton.style.display = 'block';
         } else {
-          adminNavButton.style.display = 'none';  // Намертво прячем от обычных игроков
+          adminNavButton.style.display = 'none';
         }
       }
 
-      // Отрисовка таблицы счетов
+      // 🔑 БЕЗОПАСНАЯ ОТРИСОВКА ТАБЛИЦЫ СЧЕТОВ (Только на странице счетов!)
       const tbody = document.querySelector('#table-accounts tbody');
       const selectFrom = document.getElementById('tx-from');
       const selectCredit = document.getElementById('credit-target');
       
-      tbody.innerHTML = "";
-      selectFrom.innerHTML = "";
-      selectCredit.innerHTML = "";
+      if (tbody) tbody.innerHTML = "";
+      if (selectFrom) selectFrom.innerHTML = "";
+      if (selectCredit) selectCredit.innerHTML = "";
 
-      result.accounts.forEach(acc => {
-        tbody.innerHTML += `
-          <tr>
-            <td>#${acc.id}</td>
-            <td><b>${parseFloat(acc.manny).toFixed(2)}</b> руб.</td>
-            <td>${acc.two_fa_status ? '🔒 Активна' : '❌ Выкл'}</td>
-            <td>${acc.active ? '<span style="color:green">Активен</span>' : '<span style="color:red">Забанен</span>'}</td>
-            <td><button class="btn btn-danger" onclick="closeAccount(${acc.id})">Закрыть</button></td>
-          </tr>`;
-        
-        if (acc.active) {
-          let opt = `<option value="${acc.id}">Счет #${acc.id} (${parseFloat(acc.manny).toFixed(2)} руб.)</option>`;
-          selectFrom.innerHTML += opt;
-          selectCredit.innerHTML += opt;
-        }
-      });
+      if (result.accounts && Array.isArray(result.accounts)) {
+        result.accounts.forEach(acc => {
+          // Отрисовываем таблицу, только если она физически существует на текущей странице
+          if (tbody) {
+            tbody.innerHTML += `
+              <tr>
+                <td>#${acc.id}</td>
+                <td><b>${parseFloat(acc.manny).toFixed(2)}</b> руб.</td>
+                <td>${acc.two_fa_status ? '🔒 Активна' : '❌ Выкл'}</td>
+                <td>${acc.active ? '<span style="color:green">Активен</span>' : '<span style="color:red">Забанен</span>'}</td>
+                <td><button class="btn btn-danger" onclick="closeAccount(${acc.id})">Закрыть</button></td>
+              </tr>`;
+          }
+          
+          if (acc.active) {
+            let opt = `<option value="${acc.id}">Счет #${acc.id} (${parseFloat(acc.manny).toFixed(2)} руб.)</option>`;
+            if (selectFrom) selectFrom.innerHTML += opt;
+            if (selectCredit) selectCredit.innerHTML += opt;
+          }
+        });
+      }
+
+      // Безопасный импорт аватара
       let profileRes = await fetch('/api/users/profile');
-  let profileData = await profileRes.json();
-  if (profileData.status && profileData.user.avatar) {
-    document.getElementById('user-avatar').src = profileData.user.avatar;
-  }
-    // В самый конец функции loadData():
-  await syncProfileSectionData();
+      let profileData = await profileRes.json();
+      const userAvatar = document.getElementById('user-avatar');
+      if (profileData.status && profileData.user && profileData.user.avatar && userAvatar) {
+        userAvatar.src = profileData.user.avatar;
+      }
+
+      // Запуск синхронизации профиля (сработает безопасно)
+      await syncProfileSectionData();
+      
+      // 🔑 БЕЗОПАСНЫЙ ЗАПУСК ИСТОРИИ (Сработает только на странице истории!)
+      if (document.getElementById('table-logs')) {
+        await loadTransactionLogs();
+      }
 
     } catch(e) {
-      // Если токена нет или сессия протухла — выкидываем на авторизацию
-      window.location.href = '/login.html';
+      // Блок catch больше не перехватывает ошибки верстки DOM.
+      // Сюда попадут только реальные сетевые сбои (Network Error)
+      console.error("Критическая ошибка выполнения скрипта страницы:", e);
     }
   }
+
 
 
   async function openCreateAccountModal() {
