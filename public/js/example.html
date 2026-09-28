@@ -521,7 +521,8 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       }
 
       result.logs.forEach(log => {
-        const date = new Date(log.createdAt).toLocaleString('ru-RU');
+        const date = new Date(log.createdAt).getDate().toLocaleString('ru-RU');
+        const time = new Date(log.createdAt).getTime().toLocaleString('ru-RU');
         
         // Красивое оформление типов и цвета сумм
         let typeText = "";

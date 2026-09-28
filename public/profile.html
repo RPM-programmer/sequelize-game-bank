@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <div>
+  <div class="main-container">
       <div class="sidebar">
   <div style="text-align: center; margin-bottom: 15px;">
     <img id="user-avatar" src="/uploads/avatars/default.png" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #1abc9c;">
@@ -25,8 +25,51 @@
   <button class="menu-btn btn-danger" id="logoutBtn" style="text-align: center;">Выйти из системы</button>
 </div>
 
-    <main class="main-content">
-    </main>
+    <div class="container">
+      <div class="container-center">
+  <h3>Настройки безопасности и профиля</h3>
+  
+  <!-- Форма 1: Смена аватарки -->
+  <div class="card">
+    <h4>📷 Смена аватарки профиля</h4>
+    <div class="form-group">
+      <label>Выберите изображение (PNG, JPG, макс. 2МБ):</label>
+      <input type="file" id="avatar-file" accept="image/*">
+    </div>
+    <button class="btn" onclick="uploadAvatar()">Загрузить фото</button>
+  </div>
+
+  <!-- Форма 2: Изменение пароля -->
+  <div class="card">
+    <h4>Изменение пароля аккаунта</h4>
+    <div class="form-group"><label>Старый пароль</label><input type="password" id="p-old"></div>
+    <div class="form-group"><label>Новый пароль</label><input type="password" id="p-new"></div>
+    <button class="btn" onclick="updatePassword()">Обновить пароль</button>
+  </div>
+
+  <!-- Форма 3: Изменение Gmail -->
+  <div class="card">
+    <h4>📧 Изменение адреса электронной почты</h4>
+    <div class="form-group">
+      <label>Новый адрес Google почты:</label>
+      <input type="email" id="profile-new-gmail" placeholder="new-email@gmail.com">
+    </div>
+    <button class="btn" onclick="updateGmail()">Сменить почту</button>
+  </div>
+
+  <!-- Форма 4: Управление 2FA -->
+  <div class="card">
+    <h4>Управление двухфакторной аутентификацией (2FA)</h4>
+    <p id="2fa-current-status">Текущий статус: загрузка...</p>
+    <button class="btn" id="btn-toggle-2fa" onclick="toggleSystem2FA()">Загрузка...</button>
+    
+    <div id="profile-2fa-setup" style="display: none; margin-top: 15px; text-align: center;">
+      <p style="color: #28a745; font-weight: bold; margin-bottom: 5px;">Запишите ваш токен 2FA:</p>
+      <span id="profile-2fa-key" style="font-size: 18px; font-family: monospace; background: #e9ecef; padding: 5px 10px; border-radius: 4px; letter-spacing: 1px;"></span>
+      <p style="font-size: 12px; color: #6c757d; margin-top: 5px;">Используйте этот токен при переводах, изменении пароля или удалении аккаунта.</p>
+    </div>
+  </div>
+      </div>
   </div>
 
 <script src="/js/js.js"></script>

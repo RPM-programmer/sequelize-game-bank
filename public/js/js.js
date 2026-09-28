@@ -29,6 +29,8 @@
       // Безопасное заполнение шапки профиля (если элементы есть)
       const userDisplay = document.getElementById('user-display');
       if (userDisplay) userDisplay.innerText = currentUsername.toUpperCase();
+      const userDisplayGeneral = document.getElementById('user-display-page');
+      if (userDisplayGeneral) userDisplayGeneral.innerText = currentUsername.toUpperCase();
       
       const totalManny = document.getElementById('total-manny');
       if (totalManny) totalManny.innerText = mannyData.totalManny.toFixed(2);
@@ -78,21 +80,29 @@
       let profileRes = await fetch('/api/users/profile');
       let profileData = await profileRes.json();
       const userAvatar = document.getElementById('user-avatar');
+      const userAvatar2 = document.getElementById('user-avatar2');
       if (profileData.status && profileData.user && profileData.user.avatar && userAvatar) {
         userAvatar.src = profileData.user.avatar;
       }
+      if (profileData.status && profileData.user && profileData.user.avatar && userAvatar2) {
+        userAvatar2.src = profileData.user.avatar;
+      }
+      
 
-      // Запуск синхронизации профиля (сработает безопасно)
       await syncProfileSectionData();
       
-      // 🔑 БЕЗОПАСНЫЙ ЗАПУСК ИСТОРИИ (Сработает только на странице истории!)
       if (document.getElementById('table-logs')) {
         await loadTransactionLogs();
       }
 
+      document.addEventListener('keydown', function(event) {
+        if(event.ctrlKey == true || event.key == "a"){
+          window.location.href = "/admin.html"
+        }
+      });
+
+
     } catch(e) {
-      // Блок catch больше не перехватывает ошибки верстки DOM.
-      // Сюда попадут только реальные сетевые сбои (Network Error)
       console.error("Критическая ошибка выполнения скрипта страницы:", e);
     }
   }
@@ -138,8 +148,8 @@
     const res = await fetch('/api/accounts/credit', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-body: JSON.stringify({ targetAccountId, amount, paymentsCount, autoWithdrawal, pinCode })});const data = await res.json();if(data.status) { alert("Кредит одобрен! Деньги зачислены на технический счет #" + data.creditAccountId); loadData(); } else { alert("Ошибка: " + data.message); }}async function logout() {await fetch('/api/users/logout', { method: 'POST' });window.location.href = '/login.html';}window.onload = loadData;
-async function uploadAvatar() {
+        body: JSON.stringify({ targetAccountId, amount, paymentsCount, autoWithdrawal, pinCode })});const data = await res.json();if(data.status) { alert("Кредит одобрен! Деньги зачислены на технический счет #" + data.creditAccountId); loadData(); } else { alert("Ошибка: " + data.message); }}async function logout() {await fetch('/api/users/logout', { method: 'POST' });window.location.href = '/login.html';}window.onload = loadData;
+        async function uploadAvatar() {
     const fileInput = document.getElementById('avatar-file');
     if (fileInput.files.length === 0) {
       alert("Выберите файл!");
@@ -235,23 +245,18 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       alert("Не удалось загрузить файл на server.");
     }
   }
-
-  // Обновление пароля по ТЗ
   async function updatePassword() {
     const oldPassword = document.getElementById('p-old').value;
     const newPassword = document.getElementById('p-new').value;
-
     if (!oldPassword || !newPassword) {
       alert("⚠️ Заполните оба поля паролей!");
       return;
     }
-
     let totpCode = null;
     if (user2FaActive) {
       totpCode = prompt("🔒 Безопасность: Введите ваш 2FA токен подтверждения для смены пароля:");
       if (!totpCode) return;
     }
-
     try {
       const res = await fetch('/api/users/change-password', {
         method: 'POST',
@@ -259,7 +264,6 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
         body: JSON.stringify({ oldPassword, newPassword, totpCode })
       });
       const data = await res.json();
-
       if (data.status) {
         alert("✅ Пароль успешно изменен!");
         document.getElementById('p-old').value = "";
@@ -271,8 +275,6 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       console.error(err);
     }
   }
-
-  // Изменение адреса почты
   async function updateGmail() {
     const newGmail = document.getElementById('profile-new-gmail').value.trim();
     if (!newGmail || !newGmail.includes('@')) {
@@ -298,15 +300,11 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       console.error(err);
     }
   }
-
-  // Переключение триггера 2FA защиты профиля
   async function toggleSystem2FA() {
     const url = user2FaActive ? '/api/users/disable-2fa' : '/api/users/enable-2fa';
-    
     try {
       const res = await fetch(url, { method: 'POST' });
       const data = await res.json();
-
       if (data.status) {
         if (!user2FaActive && data.secret2FA) {
           document.getElementById('profile-2fa-setup').style.display = 'block';
@@ -328,25 +326,20 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
     if (!confirm(`Вы уверены, что хотите закрыть и удалить счет #${accountId}?`)) {
       return;
     }
-
     try {
       const response = await fetch(`/api/accounts/${accountId}`, {
         method: 'DELETE'
       });
-
-      // Если сервер упал или выдал ошибку (не 200 OK), не парсим JSON, а выводим ошибку
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Критическая ошибка бэкенда:", errorText);
         alert("⚠️ Ошибка сервера при попытке закрыть счет. Попробуйте позже.");
         return;
       }
-
       const data = await response.json();
-      
       if (data.status) {
         alert("🎉 Счет успешно закрыт и удален из системы!");
-        loadData(); // Перезагружаем интерфейс и таблицы счетов
+        loadData();
       } else {
         alert(`❌ Ошибка удаления: ${data.message || 'Счет должен быть пуст и разблокирован'}`);
       }
@@ -360,39 +353,41 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       const response = await fetch('/api/accounts/my-logs');
       if (!response.ok) return;
       const result = await response.json();
-
       const tbody = document.querySelector('#table-logs tbody');
       tbody.innerHTML = "";
-
       if (result.logs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#aaa;">У вас пока нет совершенных транзакций</td></tr>`;
         return;
       }
-
       result.logs.forEach(log => {
-        const date = new Date(log.createdAt).toLocaleString('ru-RU');
-        
-        // Красивое оформление типов и цвета сумм
+        const tad = new Date(log.createdAt);
+        const date = `${tad.getFullYear()}.${tad.getMonth()}.${tad.getDay()}`;
+        const time = `${tad.getHours()}:${tad.getMinutes()}:${tad.getSeconds()}`;
         let typeText = "";
         let amountStyle = "";
         let prefix = "";
-
+        let sender = "";
         if (log.type === 'DEPOSIT' || log.type === 'TRANSFER_IN') {
-          typeText = log.type === 'DEPOSIT' ? '💵 Пополнение' : '📩 Перевод (Входящий)';
+          typeText = log.type === 'DEPOSIT' ? 'Пополнение' : 'Перевод (Входящий)';
           amountStyle = 'color: green; font-weight: bold;';
           prefix = "+";
         } else {
-          typeText = log.type === 'WITHDRAW' ? '🛒 Списание' : '📤 Перевод (Исходящий)';
+          typeText = log.type === 'WITHDRAW' ? 'Списание' : 'Перевод (Исходящий)';
           amountStyle = 'color: red; font-weight: bold;';
           prefix = "-";
         }
-
+        if(log.sender_or_receiver == "Администрация (ROOT)"){
+          sender = `<span style='color:blue' id='root001'><strong><i>Администрация (ROOT)</i></strong></span>`
+        } else {
+          sender = log.sender_or_receiver;
+        }
         tbody.innerHTML += `
           <tr>
             <td>${date}</td>
+            <td>${time}</td>
             <td><b>#${log.account_id}</b></td>
             <td>${typeText}</td>
-            <td>${log.sender_or_receiver || '—'}</td>
+            <td>${sender || '—'}</td>
             <td style="${amountStyle}">${prefix} ${parseFloat(log.amount).toFixed(2)} руб.</td>
           </tr>
         `;

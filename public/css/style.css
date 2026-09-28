@@ -34,3 +34,23 @@ body { font-family: sans-serif; margin: 0; background: #f4f6f9; display: flex; }
         justify-content: center;
         
     }
+    #user-display-page{
+        color:Blue
+    }
+    form.help_msg-form{
+        background-color: #6cb3ff;
+        padding: 10px 100px;
+        border-radius: 2px #0026ff solid;
+        border-radius: 30px;
+        gap: 30px;
+    }
+    form input[type="text"]{
+        background-color: lightgreen;
+        border: 1px solid green;
+        border-radius: 10px;
+    }
+    form input[type="submit"]{
+        background-color: lightgreen;
+        border: 1px solid green;
+        border-radius: 10px;
+    }

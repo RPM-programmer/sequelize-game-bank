@@ -53,7 +53,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 const { verifyPageSession } = require('./server/middleware/auth');
 
-const pages = ['general.html', 'profile.html', 'accounts.html', 'transfer.html', 'history.html', 'credit.html'];
+const pages = ['general.html', 'profile.html', 'accounts.html', 'transfer.html', 'history.html', 'credit.html', 'admin.html'];
 
 pages.forEach(page => {
   // Защита страниц: при переходе между ними вылетов не будет
