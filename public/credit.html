@@ -27,10 +27,35 @@
 
     <div class="container">
       <div class="container-center">
+        <h3>Заявка на автономный кредит City-bank</h3>
+    <div class="card">
+      <div class="form-group">
+        <label>Счет для зачисления кредита</label>
+        <select id="credit-target"></select>
+      </div>
+      <div class="form-group">
+        <label>Сумма кредитования</label>
+        <input type="number" id="credit-amount" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label>Срок погашения (Кол-во платежей)</label>
+        <input type="number" id="credit-payments" placeholder="Например: 12">
+      </div>
+      <div class="checkbox-group" style="margin-bottom: 15px;">
+        <input type="checkbox" id="credit-auto" checked style="width: auto;">
+        <label style="display: inline;" for="credit-auto">Разрешить автоматическое списание взносов со счета</label>
+      </div>
+      <div class="form-group">
+        <label>Пин-код счета</label>
+        <input type="password" id="credit-pin" placeholder="Введите пин-код счета">
+      </div>
+      <button class="btn" onclick="applyForCredit()">Оформить заем</button>
+    </div>
       </div>
     </div>
   </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+<script src="/js/sweetalert2.js"></script>
 <script src="/js/js.js"></script>
 </body>
 </html>

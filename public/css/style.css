@@ -1,4 +1,5 @@
-body { font-family: sans-serif; margin: 0; background: #f4f6f9; display: flex; }
+ @import url('https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css');
+ body { font-family: sans-serif; margin: 0; background: #f4f6f9; display: flex; }
     .sidebar { width: 260px; background: #2c3e50; color: white; height: 100vh; padding: 20px; box-sizing: border-box; }
     .content { flex: 1; padding: 30px; box-sizing: border-box; overflow-y: auto; height: 100vh; }
     .sidebar h2 { color: #1abc9c; margin-top: 0; text-align: center; }
@@ -54,3 +55,4 @@ body { font-family: sans-serif; margin: 0; background: #f4f6f9; display: flex; }
         border: 1px solid green;
         border-radius: 10px;
     }
+   

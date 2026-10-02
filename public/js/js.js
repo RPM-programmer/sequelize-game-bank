@@ -1,4 +1,10 @@
-  let currentUsername = "";
+//import Toastifyt from 'https://cdn.jsdelivr.net/npm/toastify-js';
+const toastifyScript = document.createElement('script');
+toastifyScript.src = 'https://cdn.jsdelivr.net/npm/toastify-js';
+document.head.append(toastifyScript);
+
+
+let currentUsername = "";
 
   function showTab(tabId) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -6,57 +12,70 @@
     document.getElementById(tabId).classList.add('active');
     event.target.classList.add('active');
   }
-
   async function loadData() {
     try {
-      // 1. Получаем инфо о пользователе и его счетах
       let response = await fetch('/api/accounts/my');
-      
-      // Защита: если сервер вернул ошибку сессии (401/403), сразу уходим на логин
       if (response.status === 401 || response.status === 403) {
+        window.Swal.fire({
+          title: 'Внимание!',
+          text: 'Сессия устарела!',
+          icon: 'warning',
+          iconColor:"orange",
+          confirmButtonText: 'ОК',
+          confirmButtonColor: '#3085d6',
+          background:'#d6cb3089'
+        });
         window.location.href = '/login.html';
         return;
       }
-      
       let result = await response.json();
-      
-      // Запрашиваем баланс и имя текущего игрока
       let mannyRes = await fetch('/api/users/my-total-manny');
       let mannyData = await mannyRes.json();
-      
       currentUsername = mannyData.username;
-      
-      // Безопасное заполнение шапки профиля (если элементы есть)
       const userDisplay = document.getElementById('user-display');
       if (userDisplay) userDisplay.innerText = currentUsername.toUpperCase();
       const userDisplayGeneral = document.getElementById('user-display-page');
       if (userDisplayGeneral) userDisplayGeneral.innerText = currentUsername.toUpperCase();
-      
       const totalManny = document.getElementById('total-manny');
       if (totalManny) totalManny.innerText = mannyData.totalManny.toFixed(2);
-
-      // ПРОВЕРКА ДЛЯ АДМИН-ПАНЕЛИ
       const adminNavButton = document.getElementById('admin-nav');
       if (adminNavButton) {
         if (currentUsername === 'root') {
+          Toastify({
+            text: "Здраствуйте админестратор!",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+              background: "linear-gradient(to right, green, blue)",
+            }
+          }).showToast();
           adminNavButton.style.display = 'block';
         } else {
+          Toastify({
+            text: `Здраствуйте, ${currentUsername}`,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+              background: "linear-gradient(to right, green, blue)",
+            }
+          }).showToast();
           adminNavButton.style.display = 'none';
         }
       }
-
-      // 🔑 БЕЗОПАСНАЯ ОТРИСОВКА ТАБЛИЦЫ СЧЕТОВ (Только на странице счетов!)
       const tbody = document.querySelector('#table-accounts tbody');
       const selectFrom = document.getElementById('tx-from');
       const selectCredit = document.getElementById('credit-target');
-      
       if (tbody) tbody.innerHTML = "";
       if (selectFrom) selectFrom.innerHTML = "";
       if (selectCredit) selectCredit.innerHTML = "";
-
       if (result.accounts && Array.isArray(result.accounts)) {
         result.accounts.forEach(acc => {
-          // Отрисовываем таблицу, только если она физически существует на текущей странице
           if (tbody) {
             tbody.innerHTML += `
               <tr>
@@ -75,8 +94,6 @@
           }
         });
       }
-
-      // Безопасный импорт аватара
       let profileRes = await fetch('/api/users/profile');
       let profileData = await profileRes.json();
       const userAvatar = document.getElementById('user-avatar');
@@ -87,40 +104,53 @@
       if (profileData.status && profileData.user && profileData.user.avatar && userAvatar2) {
         userAvatar2.src = profileData.user.avatar;
       }
-      
-
       await syncProfileSectionData();
-      
       if (document.getElementById('table-logs')) {
         await loadTransactionLogs();
       }
-
       document.addEventListener('keydown', function(event) {
         if(event.ctrlKey == true || event.key == "a"){
           window.location.href = "/admin.html"
         }
       });
-
-
     } catch(e) {
       console.error("Критическая ошибка выполнения скрипта страницы:", e);
+      window.Swal.fire({
+          title: 'Внимание!',
+          text: `Ошибка кода!${e}`,
+          icon: 'error',
+          confirmButtonText: 'ОК',
+          confirmButtonColor: '#d63030',
+          background: '#d63030'
+      });
     }
   }
-
-
-
   async function openCreateAccountModal() {
-    const pin = prompt("Придумайте секретный пин-код для нового счета (до 8 цифр/символов):");
+    const pin = await window.Swal.fire({title: 'Создание щёта', text: 'Введите надёжный пин-код!', icon: 'question', iconColor:"blue", input:"number", inputAttributes: { autocapitalize: "off" }, preConfirm:async(pincode)=>{return pincode}, confirmButtonText: 'ОК', confirmButtonColor: '#3085d6', background:'#ffffffaf'})
     if (!pin) return;
-    const fa = confirm("Включить индивидуальную 2FA-защиту транзакций для этого счета?");
-
+    const fa = await Swal.fire({title: 'Создание щёта', text: 'Включить индивидуальную 2FA-защиту транзакций для этого счета?', icon: 'question', iconColor:"blue", showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#3085d6', confirmButtonText: 'Да, включить', cancelButtonText: 'Нет, не включать'}).then((result) => {return result;});
     const res = await fetch('/api/accounts', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ pinCode: pin, enableAccount2FA: fa })
+      body: JSON.stringify({ pinCode: pin.value, enableAccount2FA: fa.isConfirmed })
     });
     const data = await res.json();
-    if(data.status) { alert("Счет успешно создан!"); loadData(); } else { alert("Ошибка: " + data.message); }
+    if(data.status) {
+      loadData(); 
+       Toastify({
+          text: `Вы создали щёт! \n Проверте "Мои щета"`,
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          stopOnFocus: true,
+          style: {
+            background: "linear-gradient(to right, yellowgreen, green)",
+          }
+        }).showToast();
+    } else {
+       alert("Ошибка: " + data.message); 
+    }
   }
 
   async function executeTransfer() {

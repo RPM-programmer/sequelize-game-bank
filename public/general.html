@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>City-Bank | Главная</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <body>
   <div class="main-container">
@@ -20,14 +23,14 @@
   <a href="/history.html" class="nav-item"><button class="menu-btn">История транзакций</button></a>
   <a href="/credit.html" class="nav-item"><button class="menu-btn">Оформить Кредит</button></a>
   <a href="/profile.html" class="nav-item"><button class="menu-btn">Управление профилем</button></a>
-  <button class="menu-btn" style="display: none; color: #ffc107;">Админ-панель</button>
+  <button class="menu-btn" onclick="location.href='/admin.html'" id="admin-nav" style="display: none; color: #ffc107;">Админ-панель</button>
   <br><br>
   <button class="menu-btn btn-danger" id="logoutBtn" style="text-align: center;">Выйти из системы</button>
 </div>
 
     <div class="container">
       <div class="container-center">
-        <div style="text-align: center; margin-bottom: 15px;">
+        <div style="text-align: center; margin-bottom: 15px;" onclick="uploadAvatar()">
           <img id="user-avatar2" src="/uploads/avatars/default.png" style="width: 250px; height: 250px; border-radius: 50%; object-fit: cover; border: 3px solid #1abc9c;">
         </div>
         <h1 id="user-display-page">Загрузка...</h1>
@@ -43,7 +46,8 @@
       </div>
     </div>
   </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+<script src="/js/sweetalert2.js"></script>
 <script src="/js/js.js"></script>
 </body>
 </html>
