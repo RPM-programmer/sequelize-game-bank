@@ -149,15 +149,22 @@ let currentUsername = "";
           }
         }).showToast();
     } else {
-       alert("Ошибка: " + data.message); 
+       Toastify({
+        text: `Перевод создание щёта не удалось!`,
+        duration:3000,
+        close:true,
+        style: { background: "RGB(245, 158, 11)" }
+      }).showToast();
+      console.error("Ошибка: " + data.message)
     }
   }
-
   async function executeTransfer() {
     const fromId = document.getElementById('tx-from').value;
     const toId = document.getElementById('tx-to').value.trim();
     const amount = document.getElementById('tx-amount').value;
     const pinCode = document.getElementById('tx-pin').value;
+    const fa = await Swal.fire({title: 'Перевод', text: 'Вы подтверждаете перевод?', icon: 'question', iconColor:"blue", showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#3085d6', confirmButtonText: 'Да, перевести', cancelButtonText: 'Нет, не переводить'}).then((result) => {return result;});
+    if(!fa.isConfirmed) return
 
     const res = await fetch('/api/accounts/transfer', {
       method: 'POST',
@@ -165,9 +172,22 @@ let currentUsername = "";
       body: JSON.stringify({ fromId, toId, amount, pinCode })
     });
     const data = await res.json();
-    if (data.status) { alert("Перевод выполнен!"); loadData(); } else { alert("Ошибка ["+data.statusCode+"]: " + data.message); }
+    if (data.status) {
+      Toastify({
+        text: `Вы перевели ${amount} на другой щёт\n #${fromId} → #${toId}`,
+        duration:3000,
+        style: { background: "rgb(58, 245, 11)" }
+      }).showToast();
+      loadData(); 
+    } else { 
+      Toastify({
+        text: `Перевод средств не удался\n #${fromId} → #${toId}`,
+        duration:3000,
+        style: { background: "RGB(245, 158, 11)" }
+      }).showToast();
+      console.error("Ошибка ["+data.statusCode+"]: " + data.message); 
+    }
   }
-
   async function applyForCredit() {
     const targetAccountId = document.getElementById('credit-target').value;
     const amount = document.getElementById('credit-amount').value;
@@ -178,37 +198,31 @@ let currentUsername = "";
     const res = await fetch('/api/accounts/credit', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ targetAccountId, amount, paymentsCount, autoWithdrawal, pinCode })});const data = await res.json();if(data.status) { alert("Кредит одобрен! Деньги зачислены на технический счет #" + data.creditAccountId); loadData(); } else { alert("Ошибка: " + data.message); }}async function logout() {await fetch('/api/users/logout', { method: 'POST' });window.location.href = '/login.html';}window.onload = loadData;
-        async function uploadAvatar() {
-    const fileInput = document.getElementById('avatar-file');
-    if (fileInput.files.length === 0) {
-      alert("Выберите файл!");
-      return;
+      body: JSON.stringify({ targetAccountId, amount, paymentsCount, autoWithdrawal, pinCode })});
+      const data = await res.json();
+      if(data.status) { 
+        await Swal.fire({title: 'Кредит', text: "Кредит одобрен! Деньги зачислены на технический счет #" + data.creditAccountId, icon: 'sucess', confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'});
+        Toastify({
+          text: `Вы взяли кредит`,
+          duration:3000,
+          style: { background: "rgb(58, 245, 11)" }
+        }).showToast();
+         
+        loadData(); 
+      } else { 
+        await Swal.fire({title: 'Кредит', text: "Ошибка", icon: 'warning', iconColor:"orange", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'});
+        console.error("Ошибка: " + data.message); 
+      }
     }
-
-    // Так как отправляем физический файл, используем FormData вместо JSON
-    const formData = new FormData();
-    // ✅ ИСПРАВЛЕННЫЙ ВАРИАНТ:
-formData.append('avatar', fileInput.files[0]); // Передаем конкретный файл
-
-
-    const res = await fetch('/api/users/avatar', {
-      method: 'POST',
-      body: formData // Заголовки Content-Type multer выставит автоматически
+    document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+      const logOut = await Swal.fire({title: 'Выход', text: 'Вы подтверждаете выход из аккаунта?', icon: 'warning', iconColor:"orange", showCancelButton: true, confirmButtonColor: '#d63030', cancelButtonColor: '#46d630', confirmButtonText: 'Да, выйти', cancelButtonText: 'Отмена'}).then((result) => {return result;});
+      if(!logOut.isConfirmed) return
+      await Toastify({ text: `Выход из акканта`, duration:3000, style: { background: "rgb(245, 128, 11)" }}).showToast();
+      console.log(await fetch('/api/users/logout', { method: 'POST' }));
+      window.location.href = '/login.html';
     });
-    const data = await res.json();
-    
-    if (data.status) {
-      alert("Аватарка успешно обновлена!");
-      document.getElementById('user-avatar').src = data.avatar; // Сразу меняем картинку
-    } else {
-      alert("Ошибка загрузки: " + data.message);
-    }
-  }
-    let user2FaActive = false; // Глобальный триггер статуса 2FA на фронтенде
-
-  // Синхронизация данных профиля при загрузке страницы
-    // Синхронизация данных профиля при загрузке страницы
+    window.onload = loadData;
+    let user2FaActive = false;
   async function syncProfileSectionData() {
     try {
       const response = await fetch('/api/users/profile');
@@ -244,13 +258,10 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       console.error("Ошибка парсинга или запроса профиля:", e);
     }
   }
-
-
-  // Асинхронная загрузка картинки аватарки (через FormData)
   async function uploadAvatar() {
     const fileInput = document.getElementById('avatar-file');
     if (fileInput.files.length === 0) {
-      alert("⚠️ Пожалуйста, выберите файл изображения!");
+      await Swal.fire({title: 'Изменение аватарки', text: 'Пожалуйста, выберите файл изображения', icon: 'warning', iconColor:"orange", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'}).then((result) => {return result;});
       return;
     }
 
@@ -265,26 +276,32 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       const data = await res.json();
 
       if (data.status) {
-        alert("📷 Аватарка успешно обновлена!");
+        await Swal.fire({title: 'Изменение аватарки', text: 'Аватарка успешно обновлена', icon: 'sucess', confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'});
+        Toastify({
+          text: `Вы изменили аватарку`,
+          duration:3000,
+          style: { background: "rgb(58, 245, 11)" }
+        }).showToast();
         document.getElementById('user-avatar').src = data.avatar;
         fileInput.value = "";
       } else {
-        alert("Ошибка: " + data.message);
+        await Swal.fire({title: 'Изменение аватарки', text: 'Ошибка', icon: 'warning', iconColor:"orange", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'});
+        console.log("Ошибка: " + data.message);
       }
     } catch (err) {
-      alert("Не удалось загрузить файл на server.");
+      await Swal.fire({title: 'Изменение аватарки', text: 'Ошибка. Не удалось загрузить файл на сервер', icon: 'error', confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'});
+      console.error(err);
     }
   }
   async function updatePassword() {
     const oldPassword = document.getElementById('p-old').value;
     const newPassword = document.getElementById('p-new').value;
     if (!oldPassword || !newPassword) {
-      alert("⚠️ Заполните оба поля паролей!");
+      const t = await Swal.fire({title: 'Изменение пароля', text: 'Заполните оба поля паролей', icon: 'warning', iconColor:"orange", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'}).then((result) => {return result;});    
       return;
     }
-    let totpCode = null;
     if (user2FaActive) {
-      totpCode = prompt("🔒 Безопасность: Введите ваш 2FA токен подтверждения для смены пароля:");
+      const { value: totpCode } = await Swal.fire({title: "Изменение пароля", text:"Введите ваш 2FA токен подтверждения для смены пароля", icon:"question", iconColor:"blue", input: "password", inputLabel: "Password", inputPlaceholder: "Введите ваш 2FA токен", inputAttributes: {maxlength: "10", autocapitalize: "off", autocorrect: "off"}});
       if (!totpCode) return;
     }
     try {
@@ -295,11 +312,17 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       });
       const data = await res.json();
       if (data.status) {
-        alert("✅ Пароль успешно изменен!");
+        await Swal.fire({title:"Изменение пароля", text:"Пароль успешно изменен", icon:"sucess", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'})
         document.getElementById('p-old').value = "";
         document.getElementById('p-new').value = "";
+        Toastify({
+          text: `Вы изменили пароль`,
+          duration:3000,
+          style: { background: "rgb(58, 245, 11)" }
+        }).showToast();
       } else {
-        alert("Ошибка изменения пароля. Код [" + data.statusCode + "]");
+        console.error("Ошибка изменения пароля. Код [" + data.statusCode + "]");
+        await Swal.fire({title:"Изменение пароля", text:"Ошибка изменения пароля", icon:"warning", iconColor:"orange", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'})
       }
     } catch (err) {
       console.error(err);
@@ -308,7 +331,7 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
   async function updateGmail() {
     const newGmail = document.getElementById('profile-new-gmail').value.trim();
     if (!newGmail || !newGmail.includes('@')) {
-      alert("⚠️ Введите корректный адрес почты!");
+      await Swal.fire({title: 'Изменение почты', text: 'Введите корректный адрес почты!', icon: 'warning', iconColor:"orange", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'}).then((result) => {return result;});
       return;
     }
 
@@ -321,10 +344,17 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       const data = await res.json();
 
       if (data.status) {
-        alert("📧 Адрес Google почты успешно обновлен!");
+        await Swal.fire({title: 'Изменение почты', text: 'Адрес Google почты успешно обновлен!', icon: 'sucess', confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'}).then((result) => {return result;});
+        Toastify({
+          text: `Вы изменили адрес элекстронной почты`,
+          duration:3000,
+          style: { background: "rgb(15, 245, 11)" }
+        }).showToast();
+        console.log("Адрес Google почты успешно обновлен!");
         document.getElementById('profile-new-gmail').value = "";
       } else {
-        alert("Ошибка смены почты: Код [" + data.statusCode + "]");
+        await Swal.fire({title: 'Изменение почты', text: 'Ошибка смены почты', icon: 'warning', iconColor:"orange", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'}).then((result) => {return result;});
+        console.log("Ошибка смены почты: Код [" + data.statusCode + "]");
       }
     } catch (err) {
       console.error(err);
@@ -339,23 +369,34 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
         if (!user2FaActive && data.secret2FA) {
           document.getElementById('profile-2fa-setup').style.display = 'block';
           document.getElementById('profile-2fa-key').innerText = data.secret2FA;
-          alert("🔒 Защита 2FA успешно активирована! Обязательно сохраните токен.");
+          Toastify({
+            text: `Защита 2FA успешно активирована`,
+            duration:3000,
+            style: { background: "rgb(31, 245, 11)" }
+          }).showToast();
         } else {
           document.getElementById('profile-2fa-setup').style.display = 'none';
-          alert("⚠️ Защита 2FA успешно отключена.");
+          Toastify({
+            text: `Защита 2FA успешно отключена`,
+            duration:3000,
+            style: { background: "rgb(245, 171, 11)" }
+          }).showToast();
         }
         syncProfileSectionData();
       } else {
-        alert("Ошибка управления 2FA");
+        Toastify({
+          text: `Ошибка управления 2FA`,
+          duration:3000,
+          style: { background: "rgb(245, 11, 11)" }
+        }).showToast();
       }
     } catch (err) {
       console.error(err);
     }
   }
   async function closeAccount(accountId) {
-    if (!confirm(`Вы уверены, что хотите закрыть и удалить счет #${accountId}?`)) {
-      return;
-    }
+    const deleteAccountStatus = await Swal.fire({title: 'Удаление щёта', text: 'Вы действительно хотите удалить щёт?', icon: 'warning', iconColor:"orange", showCancelButton: true, confirmButtonColor: '#d63030', cancelButtonColor: '#46d630', confirmButtonText: 'Да, удалить', cancelButtonText: 'Отмена'}).then((result) => {return result;});    
+    if (!deleteAccountStatus.isConfirmed) return;
     try {
       const response = await fetch(`/api/accounts/${accountId}`, {
         method: 'DELETE'
@@ -363,19 +404,32 @@ formData.append('avatar', fileInput.files[0]); // Передаем конкре�
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Критическая ошибка бэкенда:", errorText);
-        alert("⚠️ Ошибка сервера при попытке закрыть счет. Попробуйте позже.");
+        await Swal.fire({title: 'Удаление щёта', text:'Ошибка при удалении щета. Попробуйте позже...', icon: 'error', iconColor:"orange", showCancelButton: true, confirmButtonColor: '#307bd6', confirmButtonText: 'Ок'}).then((result) => {return result;});    
         return;
       }
       const data = await response.json();
       if (data.status) {
-        alert("🎉 Счет успешно закрыт и удален из системы!");
+        Toastify({
+          text: `Щёт успешно удалён`,
+          duration:3000,
+          style: { background: "rgb(46, 245, 11)" }
+        }).showToast();
         loadData();
       } else {
-        alert(`❌ Ошибка удаления: ${data.message || 'Счет должен быть пуст и разблокирован'}`);
+        Toastify({
+          text: `Ошибка удаления`,
+          duration:3000,
+          style: { background: "rgb(245, 187, 11)" }
+        }).showToast();
+        await Swal.fire({title: 'Удаление щёта', text:'Ошибка при удалении щета. Счет должен быть пуст и разблокирован', icon: 'information', iconColor:"orange", showCancelButton: true, confirmButtonColor: '#307bd6', confirmButtonText: 'Ок'}).then((result) => {return result;});    
       }
     } catch (err) {
       console.error("Ошибка при закрытии счета:", err);
-      alert("Не удалось отправить запрос на удаление счета.");
+      Toastify({
+        text: `Ошибка удаления`,
+        duration:3000,
+        style: { background: "rgb(245, 11, 11)" }
+      }).showToast();
     }
   }
   async function loadTransactionLogs() {
