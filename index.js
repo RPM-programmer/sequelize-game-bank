@@ -66,10 +66,11 @@ pages.forEach(page => {
 // 3. Открытые страницы, доступные БЕЗ авторизации
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
-
-// Перенаправление с главного адреса на главную страницу банка
+app.get('/home.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'home.html')));
+app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'icon', 'icon.png')));
+// Перенаправление с глав,,,,,,ного адреса на главную страницу банка
 app.get('/', verifySession, (req, res) => res.redirect('/general.html'));
-
+app.get('/', (req, res) => res.redirect('/home.html'));
 // ... (остальной код возврата configuredApp)
 
     return configuredApp;

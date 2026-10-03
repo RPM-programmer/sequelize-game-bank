@@ -127,7 +127,7 @@ let currentUsername = "";
   }
   async function openCreateAccountModal() {
     const pin = await window.Swal.fire({title: 'Создание щёта', text: 'Введите надёжный пин-код!', icon: 'question', iconColor:"blue", input:"number", inputAttributes: { autocapitalize: "off" }, preConfirm:async(pincode)=>{return pincode}, confirmButtonText: 'ОК', confirmButtonColor: '#3085d6', background:'#ffffffaf'})
-    if (!pin) return;
+    if (!pin.value) return;
     const fa = await Swal.fire({title: 'Создание щёта', text: 'Включить индивидуальную 2FA-защиту транзакций для этого счета?', icon: 'question', iconColor:"blue", showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#3085d6', confirmButtonText: 'Да, включить', cancelButtonText: 'Нет, не включать'}).then((result) => {return result;});
     const res = await fetch('/api/accounts', {
       method: 'POST',
@@ -150,7 +150,7 @@ let currentUsername = "";
         }).showToast();
     } else {
        Toastify({
-        text: `Перевод создание щёта не удалось!`,
+        text: `cоздание щёта не удалось!`,
         duration:3000,
         close:true,
         style: { background: "RGB(245, 158, 11)" }
