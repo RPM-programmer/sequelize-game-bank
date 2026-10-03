@@ -1,6 +1,6 @@
 {
   "name": "sequelize-game-bank",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Модульная архитектура City-bank с поддержкой кредитов и 2FA",
   "main": "index.js",
   "type": "commonjs",
