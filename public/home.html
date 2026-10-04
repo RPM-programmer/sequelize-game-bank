@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сеть Терминалов Нео-Банка</title>
+    <style>
+        :root {
+            --neon-blue: #00f0ff;
+            --neon-purple: #bd00ff;
+            --neon-gold: #ffb703;
+            --bg-dark: #0a0b10;
+            --panel-bg: rgba(20, 24, 38, 0.9);
+            --border-color: #262b40;
+            --text-color: #e2e8f0;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 80% 20%, rgba(189, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(0, 240, 255, 0.1) 0%, transparent 50%);
+        }
+        .bank-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(10, 11, 16, 0.8);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            box-sizing: border-box;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        .logo span {
+            color: var(--neon-purple);
+        }
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        .btn-auth {
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .btn-login {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+        .btn-login:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+        }
+        .btn-register {
+            background: linear-gradient(135deg, var(--neon-purple), #8900ff);
+            color: #fff;
+            border: none;
+            box-shadow: 0 0 15px rgba(189, 0, 255, 0.4);
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(189, 0, 255, 0.8);
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+.promo-billboard {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    width: 800px;
+    height: 380px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+        .promo-billboard::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--neon-blue);
+        }
+        .promo-slider {
+            width: 100%;
+        }
+        .promo-slide {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out forwards;
+        }
+        .promo-slide.active {
+            display: block;
+        }
+        .promo-tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--neon-blue);
+            margin-bottom: 20px;
+            display: inline-block;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .promo-title {
+            font-size: 38px;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 20px 0;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+        .promo-title span {
+            color: var(--neon-gold);
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
+        }
+.promo-text {
+    font-size: 16px;
+    color: #94a3b8;
+    max-width: 650px;
+    height: 80px;         
+    margin: 0 auto;
+    line-height: 1.6;
+    overflow-y: auto;     
+}
+.background-interactive-container {
+    position: fixed;
+    top: 50%; 
+    left: 50%;
+    width: 150px;
+    height: 150px;
+    margin-top: -75px;
+    margin-left: -75px;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+    animation: drift 24s infinite linear; 
+}
+.crystal-core {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(189, 0, 255, 0.15));
+    border: 2px solid rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+    border-radius: 38% 62% 62% 38%;
+    cursor: pointer;
+    animation: floatAndRotate 6s infinite ease-in-out;
+    transition: all 0.3s ease;
+}
+.crystal-core:hover {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.4), rgba(189, 0, 255, 0.4));
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.6);
+}
+.crystal-core:active {
+    transform: scale(0.85);
+}
+@keyframes drift {
+    0%   { transform: translate(0vw, 0vh); }
+    15%  { transform: translate(35vw, -35vh); }
+    30%  { transform: translate(-40vw, -20vh); }
+    45%  { transform: translate(-25vw, 30vh); }
+    60%  { transform: translate(30vw, 25vh); }
+    75%  { transform: translate(40vw, -10vh); }
+    90%  { transform: translate(-30vw, -35vh); }
+    100% { transform: translate(0vw, 0vh); }
+}
+.promo-billboard {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 800px;
+    height: 380px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;     
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.corner-notification {
+    position: fixed;
+    top: 90px;
+    right: 40px;
+    color: var(--neon-gold);
+    font-weight: bold;
+    font-size: 20px;
+    text-shadow: 0 0 10px var(--neon-gold);
+    background: rgba(20, 24, 38, 0.85);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 999;
+    animation: fadeOutNotice 1.5s ease-out forwards;
+}
+@keyframes fadeOutNotice {
+    0% { opacity: 0; transform: translateY(-10px); }
+    15% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-5px); }
+}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .bank-navbar {
+        padding: 15px 20px;
+    }
+    .logo {
+        font-size: 18px;
+    }
+    .btn-auth {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+    .promo-title {
+        font-size: 26px;
+        margin-bottom: 15px;
+    }
+    .promo-text {
+        font-size: 14px;
+        height: 90px;
+    }
+    .promo-tag {
+        font-size: 10px;
+        margin-bottom: 15px;
+    }
+    .corner-notification {
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        font-size: 16px;
+        width: 80%;
+        text-align: center;
+    }
+    @keyframes fadeOutNotice {
+        0% { opacity: 0; transform: translate(50%, 10px); }
+        15% { opacity: 1; transform: translate(50%, 0); }
+        80% { opacity: 1; }
+        100% { opacity: 0; transform: translate(50%, -5px); }
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="background-interactive-container">
+    <div class="crystal-ring"></div>
+    <div class="crystal-core" id="interactive-crystal" onclick="spawnParticle(event)"></div>
+</div>
+    <header class="bank-navbar">
+        <div class="logo">GAME-<span>BANK</span></div>
+        <div class="auth-buttons">
+            <a href="/login.html"><button class="btn-auth btn-login">Войти</button></a>
+            <a href="/register.html"><button class="btn-auth btn-register">Регистрация</button></a>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="promo-billboard">
+            <div class="promo-slider">
+                <div class="promo-slide active">
+                    <span class="promo-tag">Введение</span>
+                    <h1 class="promo-title"><span>Первый</span> npm модуль для создания банка</h1>
+                    <p class="promo-text">Открой щёт в защищёмном от атак банке!</p>
+                </div>
+                <div class="promo-slide">
+                    <span class="promo-tag">Возможности</span>
+                    <h1 class="promo-title">Открой <span>большие возможности</span> в нашем банке</h1>
+                    <p class="promo-text">Регистрация полностью бесплатная</p>
+                </div>
+                <div class="promo-slide">
+                    <span class="promo-tag">Регистрация</span>
+                    <h1 class="promo-title"><span>нет аккаунта?</span></h1>
+                    <p class="promo-text">Нажми на кнопку "регистрация"</p>
+                </div>
+                <div class="promo-slide">
+                    <span class="promo-tag">Вход</span>
+                    <h1 class="promo-title"><span>Не знаешь как войти?</span></h1>
+                    <p class="promo-text">Нажми на кнопку "Войти"</p>
+                </div>
+                <div class="promo-slide">
+                    <span class="promo-tag">Безкомисный переводы</span>
+                    <h1 class="promo-title"><span>Не боись</span> потерять деньги при переводе</h1>
+                    <p class="promo-text">0% комиссии при переводе любого количества средств</p>
+                </div>
+                <div class="promo-slide">
+                    <span class="promo-tag">Кредит</span>
+                    <h1 class="promo-title"><span>Мало </span>денег?</h1>
+                    <p class="promo-text">Возьмите кредит под 0% (акция)</p>
+                </div>
+                <div class="promo-slide">
+                    <span class="promo-tag">Управление</span>
+                    <h1 class="promo-title">Хочешь <span>отредактировать</span> профиль?</h1>
+                    <p class="promo-text">Зайти в аккаунт, а после нажми на "Профиль"</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const slides = document.querySelectorAll('.promo-slide');
+        let currentSlide = 0;
+
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        setInterval(nextSlide, 5000);
+function moveObjectRandomly() {
+    const maxX = window.innerWidth - 160;
+    const maxY = window.innerHeight - 160;
+    const randomX = Math.floor(Math.random() * maxX);
+    const randomY = Math.floor(Math.random() * maxY);
+    container.style.left = randomX + 'px';
+    container.style.top = randomY + 'px';
+}
+moveObjectRandomly();
+setInterval(moveObjectRandomly, 4000);
+function spawnParticle(event) {
+    const notice = document.createElement('div');
+    notice.className = 'corner-notification';
+    const rewards = ['+🪙', '+🪙', '+⭐', '+💎'];
+    notice.innerText = rewards[Math.floor(Math.random() * rewards.length)];
+    document.body.appendChild(notice);
+    setTimeout(() => {
+        notice.remove();
+    }, 500);
+}
+    </script>
+</body>
+</html>

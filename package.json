@@ -1,0 +1,41 @@
+{
+  "name": "sequelize-game-bank",
+  "version": "1.0.0",
+  "description": "Модульная архитектура City-bank с поддержкой кредитов и 2FA",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node test.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "chalk-palette": "^2.0.0",
+    "cookie-parser": "^1.4.7",
+    "custom-color-logs": "^3.1.0",
+    "dotenv": "^18.0.0",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "load-stopper": "^1.1.0",
+    "multer": "^2.4.0",
+    "nodemailer": "^10.0.10",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.4",
+    "sequelize": "^6.37.8",
+    "sqlite3": "^6.0.1"
+  },
+  "keywords": [
+    "sequelize",
+    "bank",
+    "game"
+  ],
+  "homepage": "https://github.com/RPM-programmer/sequelize-game-bank#readme",
+  "bugs": {
+    "url": "https://github.com/RPM-programmer/sequelize-game-bank/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RPM-programmer/sequelize-game-bank.git"
+  },
+  "license": "ISC",
+  "author": "prm-programmer"
+}

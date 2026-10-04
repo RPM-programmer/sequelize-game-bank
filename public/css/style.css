@@ -1,0 +1,58 @@
+ @import url('https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css');
+ body { font-family: sans-serif; margin: 0; background: #f4f6f9; display: flex; }
+    .sidebar { width: 260px; background: #2c3e50; color: white; height: 100vh; padding: 20px; box-sizing: border-box; }
+    .content { flex: 1; padding: 30px; box-sizing: border-box; overflow-y: auto; height: 100vh; }
+    .sidebar h2 { color: #1abc9c; margin-top: 0; text-align: center; }
+    .menu-btn { width: 100%; padding: 12px; background: none; border: none; color: white; text-align: left; font-size: 16px; cursor: pointer; border-radius: 4px; margin-bottom: 5px; }
+    .menu-btn:hover, .menu-btn.active { background: #34495e; color: #1abc9c; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 25px; }
+    .section { display: none; }
+    .section.active { display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+    th { background: #f8f9fa; }
+    .form-group { margin-bottom: 15px; max-width: 400px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-danger { background: #dc3545; }
+    div.container{
+        display: flex;
+        flex-direction: column;
+        justify-content:start;
+        align-items: center;
+        width: 1400px;
+    }
+    div.container-center{
+        display: flex;
+        flex-direction: column;
+        justify-content:center;
+        align-items: center;
+    }
+    div.main-container{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        
+    }
+    #user-display-page{
+        color:Blue
+    }
+    form.help_msg-form{
+        background-color: #6cb3ff;
+        padding: 10px 100px;
+        border-radius: 2px #0026ff solid;
+        border-radius: 30px;
+        gap: 30px;
+    }
+    form input[type="text"]{
+        background-color: lightgreen;
+        border: 1px solid green;
+        border-radius: 10px;
+    }
+    form input[type="submit"]{
+        background-color: lightgreen;
+        border: 1px solid green;
+        border-radius: 10px;
+    }
+   

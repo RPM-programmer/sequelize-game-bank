@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>City-Bank | Кредитование</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="main-container">
+      <div class="sidebar">
+  <div style="text-align: center; margin-bottom: 15px;">
+    <img id="user-avatar" src="/uploads/avatars/default.png" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #1abc9c;">
+  </div>
+  <h2 id="user-display">Загрузка...</h2>
+  <p style="text-align: center; color: #bbb;">Всего средств: <span id="total-manny" style="font-weight: bold; color: #1abc9c;">0.00</span> руб.</p>
+  <hr style="border-color: #34495e;">
+  <a href="/general.html" class="nav-item"><button class="menu-btn active">Главная</button></a>
+  <a href="/accounts.html" class="nav-item"><button class="menu-btn">Мои Счета</button></a>
+  <a href="/transfer.html" class="nav-item"><button class="menu-btn">Перевод средств</button></a>
+  <a href="/history.html" class="nav-item"><button class="menu-btn">История транзакций</button></a>
+  <a href="/credit.html" class="nav-item"><button class="menu-btn">Оформить Кредит</button></a>
+  <a href="/profile.html" class="nav-item"><button class="menu-btn">Управление профилем</button></a>
+  <button class="menu-btn" onclick="location.href='/admin.html'" id="admin-nav" style="display: none; color: #ffc107;">Админ-панель</button>
+  <br><br>
+  <button class="menu-btn btn-danger" id="logoutBtn" style="text-align: center;">Выйти из системы</button>
+</div>
+
+    <div class="container">
+      <div class="container-center">
+        <h3>Заявка на автономный кредит City-bank</h3>
+    <div class="card">
+      <div class="form-group">
+        <label>Счет для зачисления кредита</label>
+        <select id="credit-target"></select>
+      </div>
+      <div class="form-group">
+        <label>Сумма кредитования</label>
+        <input type="number" id="credit-amount" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label>Срок погашения (Кол-во платежей)</label>
+        <input type="number" id="credit-payments" placeholder="Например: 12">
+      </div>
+      <div class="checkbox-group" style="margin-bottom: 15px;">
+        <input type="checkbox" id="credit-auto" checked style="width: auto;">
+        <label style="display: inline;" for="credit-auto">Разрешить автоматическое списание взносов со счета</label>
+      </div>
+      <div class="form-group">
+        <label>Пин-код счета</label>
+        <input type="password" id="credit-pin" placeholder="Введите пин-код счета">
+      </div>
+      <button class="btn" onclick="applyForCredit()">Оформить заем</button>
+    </div>
+      </div>
+    </div>
+  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+<script src="/js/sweetalert2.js"></script>
+<script src="/js/js.js"></script>
+</body>
+</html>

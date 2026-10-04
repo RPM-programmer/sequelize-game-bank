@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>City-Bank | История</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="main-container">
+    <div class="sidebar">
+      <div style="text-align: center; margin-bottom: 15px;">
+        <img id="user-avatar" src="/uploads/avatars/default.png" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #1abc9c;">
+      </div>
+      <h2 id="user-display">Загрузка...</h2>
+      <p style="text-align: center; color: #bbb;">Всего средств: <span id="total-manny" style="font-weight: bold; color: #1abc9c;">0.00</span> руб.</p>
+      <hr style="border-color: #34495e;">
+      <a href="/general.html" class="nav-item"><button class="menu-btn active">Главная</button></a>
+      <a href="/accounts.html" class="nav-item"><button class="menu-btn">Мои Счета</button></a>
+      <a href="/transfer.html" class="nav-item"><button class="menu-btn">Перевод средств</button></a>
+      <a href="/history.html" class="nav-item"><button class="menu-btn">История транзакций</button></a>
+      <a href="/credit.html" class="nav-item"><button class="menu-btn">Оформить Кредит</button></a>
+      <a href="/profile.html" class="nav-item"><button class="menu-btn">Управление профилем</button></a>
+  <button class="menu-btn" onclick="location.href='/admin.html'" id="admin-nav" style="display: none; color: #ffc107;">Админ-панель</button>
+      <br><br>
+      <button class="menu-btn btn-danger" id="logoutBtn" style="text-align: center;">Выйти из системы</button>
+    </div>
+    <div class="container">
+      <div class="container-center">
+        <div style="text-align: center; margin-bottom: 15px;">
+          <img id="user-avatar2" src="/uploads/avatars/default.png" style="width: 250px; height: 250px; border-radius: 50%; object-fit: cover; border: 3px solid #1abc9c;">
+        </div>
+        <h3>История финансовых операций</h3>
+        <div class="card">
+          <table id="table-logs">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Счет в банке</th>
+                <th>Тип операции</th>
+                <th>Отправитель / Инициатор</th>
+                <th>Сумма изменений</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <footer>
+          <p style="color: lightslategray;">Банк ©2026</p>
+        </footer>
+      </div>
+    </div>
+  </div>
+<dialog id="admin">
+  <h1>hello</h1>
+</dialog>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+<script src="/js/sweetalert2.js"></script>
+<script src="/js/js.js"></script>
+</body>
+</html>

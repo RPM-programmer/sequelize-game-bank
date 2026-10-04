@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>City-bank | Центральный пульт ROOT</title>
+  <style>
+    :root {
+      --bg: #2c3e50;
+      --card: #34495e;
+      --text: #ffffff;
+      --primary: #007bff;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+    }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 30px; margin: 0; }
+    .container { background: var(--card); padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 1000px; margin: 0 auto; }
+    h2 { color: var(--warning); margin-top: 0; text-align: center; letter-spacing: 1px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; color: #333; border-radius: 6px; overflow: hidden; }
+    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #e9ecef; font-weight: bold; }
+    .btn { padding: 8px 14px; border: none; background: var(--primary); color: white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn-ban { background: var(--danger); }
+    .btn-unban { background: var(--success); }
+    .manny-click { color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline; }
+    .manny-click:hover { color: #0056b3; }
+    
+    /* Стили всплывающего модального окна */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: white; color: #333; padding: 25px; border-radius: 8px; width: 100%; max-width: 350px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .modal-content h3 { margin-top: 0; color: var(--card); }
+    .form-group { margin: 15px 0; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>👑 ЦЕНТРАЛЬНЫЙ ПУЛЬТ АДМИНИСТРАТОРА (ROOT)</h2>
+  <button class="btn" onclick="location.href='/general.html'" style="background:#6c757d;"><- В личный кабинет</button>
+
+  <!-- Интерактивная таблица всех счетов -->
+  <table id="all-accounts-table">
+    <thead>
+      <tr>
+        <th>ID Счета</th>
+        <th>Владелец (Ник)</th>
+        <th>Деньги на счете (Клик для изменения)</th>
+        <th>2FA Защита</th>
+        <th>Статус счета</th>
+        <th>Управление статусом</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Данные подгружаются асинхронно через JS -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Всплывающее окно тайного изменения баланса -->
+<div id="manny-modal" class="modal">
+  <div class="modal-content">
+    <h3 id="modal-title">Изменение баланса счета #0</h3>
+    <input type="hidden" id="modal-account-id">
+    
+    <div class="form-group">
+      <label for="modal-action-type">Выберите действие:</label>
+      <select id="modal-action-type">
+        <option value="add">Увеличить баланс (+)</option>
+        <option value="remove">Уменьшить баланс (-)</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="modal-amount">Сумма операции (руб):</label>
+      <input type="number" id="modal-amount" placeholder="0.00" step="0.01" min="0.01">
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn" style="background: #6c757d;" onclick="closeMannyModal()">Отмена</button>
+      <button class="btn btn-unban" onclick="submitMannyModification()">Применить тайное изменение</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Загрузка таблицы при старте страницы
+  async function loadAdminDashboard() {
+    try {
+      const response = await fetch('/api/admin/accounts/all');
+      const result = await response.json();
+
+      if (!response.ok || !result.status) {
+        alert("Отказано в доступе или ошибка БД!");
+        window.location.href = '/dashboard.html';
+        return;
+      }
+
+      const tbody = document.querySelector('#all-accounts-table tbody');
+      tbody.innerHTML = "";
+
+      result.accounts.forEach(acc => {
+        // Логика кнопки блокировки: если активен — показываем "Заблокировать", иначе "Разблокировать"
+        const statusText = acc.active ? '<span style="color:green; font-weight:bold;">Разблокирован</span>' : '<span style="color:red; font-weight:bold;">Заблокирован</span>';
+        const actionButton = acc.active 
+          ? `<button class="btn btn-ban" onclick="toggleAccountStatus(${acc.id}, false)">🚫 Заблокировать</button>`
+          : `<button class="btn btn-unban" onclick="toggleAccountStatus(${acc.id}, true)">✅ Разблокировать</button>`;
+
+        tbody.innerHTML += `
+          <tr>
+            <td>#${acc.id}</td>
+            <td><b>${acc.user}</b></td>
+            <td><span class="manny-click" onclick="openMannyModal(${acc.id}, ${acc.manny})">${parseFloat(acc.manny).toFixed(2)} руб.</span></td>
+            <td>${acc.two_fa_status ? '🔒 Включена' : '❌ Отключена'}</td>
+            <td>${statusText}</td>
+            <td>${actionButton}</td>
+          </tr>
+        `;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Переключение статуса бана/разбана
+  async function toggleAccountStatus(accountId, makeActive) {
+    try {
+      const response = await fetch(`/api/admin/accounts/${accountId}/status`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ active: makeActive })
+      });
+      const data = await response.json();
+      if (data.status) {
+        loadAdminDashboard(); // Перерисовываем таблицу
+      } else {
+        alert("Не удалось изменить статус счета.");
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  }
+
+  // Управление модальным окном изменения денег
+  function openMannyModal(accountId, currentManny) {
+    document.getElementById('modal-account-id').value = accountId;
+    document.getElementById('modal-title').innerText = `Счет #${accountId} (Текущий: ${parseFloat(currentManny).toFixed(2)} руб.)`;
+    document.getElementById('modal-amount').value = "";
+    document.getElementById('manny-modal').style.display = 'flex';
+  }
+
+  function closeMannyModal() {
+    document.getElementById('manny-modal').style.display = 'none';
+  }
+
+  // Отправка запроса на тайное изменение баланса (БЕЗ уведомления пользователя)
+  async function submitMannyModification() {
+    const accountId = document.getElementById('modal-account-id').value;
+    const amount = document.getElementById('modal-amount').value;
+    const type = document.getElementById('modal-action-type').value;
+
+    if (!amount || parseFloat(amount) <= 0) {
+      alert("Введите корректную сумму!");
+      return;
+    }
+
+    try {
+      // Роут /modify работает через add-manny.js и remove-manny.js, которые НЕ шлют письма по ТЗ
+      const response = await fetch(`/api/admin/accounts/${accountId}/modify`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ amount, type })
+      });
+      const data = await response.json();
+
+      if (data.status) {
+        closeMannyModal();
+        loadAdminDashboard(); // Обновляем данные на экране
+      } else {
+        alert("Ошибка изменения баланса: " + data.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Запуск при загрузке
+  window.onload = loadAdminDashboard;
+</script>
+</body>
+</html>
