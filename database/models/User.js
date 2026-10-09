@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/init-db');
-
 const User = sequelize.define('user', {
   name: {
     type: DataTypes.STRING,
@@ -8,11 +7,11 @@ const User = sequelize.define('user', {
     allowNull: false
   },
   user_name: {
-    type: DataTypes.STRING, // Настоящее имя (bcrypt)
+    type: DataTypes.STRING,
     allowNull: false
   },
   user_surname: {
-    type: DataTypes.STRING, // Настоящая фамилия (bcrypt)
+    type: DataTypes.STRING,
     allowNull: false
   },
   user_gmail: {
@@ -27,12 +26,12 @@ const User = sequelize.define('user', {
     field: '2FA-status'
   },
   two_fa_token: {
-    type: DataTypes.STRING, // Хешированный секрет аутентификатора
+    type: DataTypes.STRING,
     allowNull: true,
     field: '2FA-token'
   },
   token: {
-    type: DataTypes.STRING, // Хешированный токен аварийного входа
+    type: DataTypes.STRING,
     allowNull: false
   },
   password: {
@@ -42,9 +41,7 @@ const User = sequelize.define('user', {
   avatar: {
     type: DataTypes.STRING,
     allowNull: true,
-    defaultValue: '/uploads/avatars/default.png' // Стандартная аватарка для всех
+    defaultValue: '/uploads/avatars/default.png'
   }
-
 });
-
 module.exports = User;

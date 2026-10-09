@@ -1,4 +1,18 @@
-citybank.db
+# Конфиденциальные данные и локальные настройки
+.git/
+.gitignore
 .env
+.env.example
+
+# База данных (публиковать пустую или чужую БД в npm нельзя)
+database/citybank.db
+database/config/
+
+# Тесты (конечным пользователям твоего банка они не нужны)
+test.js
+
+# Логи и мусор ОС
 logs/
-avatars/
+*.log
+.DS_Store
+Thumbs.db

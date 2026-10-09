@@ -1,5 +1,4 @@
 const Account = require('../../models/Account');
-
 module.exports = async function mathManny(username) {
   try {
     const total = await Account.sum('manny', { where: { user: username } });

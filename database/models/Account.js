@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/init-db');
 const User = require('./User');
-
 const Account = sequelize.define('account', {
   id: {
     type: DataTypes.INTEGER,
@@ -37,8 +36,6 @@ const Account = sequelize.define('account', {
     field: '2FA-status'
   }
 });
-
 User.hasMany(Account, { foreignKey: 'user', sourceKey: 'name' });
 Account.belongsTo(User, { foreignKey: 'user', targetKey: 'name', as: 'owner' });
-
 module.exports = Account;

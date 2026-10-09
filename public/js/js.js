@@ -108,11 +108,6 @@ let currentUsername = "";
       if (document.getElementById('table-logs')) {
         await loadTransactionLogs();
       }
-      document.addEventListener('keydown', function(event) {
-        if(event.ctrlKey == true || event.key == "a"){
-          window.location.href = "/admin.html"
-        }
-      });
     } catch(e) {
       console.error("Критическая ошибка выполнения скрипта страницы:", e);
       window.Swal.fire({
@@ -188,41 +183,116 @@ let currentUsername = "";
       console.error("Ошибка ["+data.statusCode+"]: " + data.message); 
     }
   }
-  async function applyForCredit() {
+
+
+
+
+
+
+
+async function applyForCredit() {
+    // 1. Извлекаем значения из ваших оригинальных ID элементов HTML
     const targetAccountId = document.getElementById('credit-target').value;
     const amount = document.getElementById('credit-amount').value;
     const paymentsCount = document.getElementById('credit-payments').value;
     const autoWithdrawal = document.getElementById('credit-auto').checked;
     const pinCode = document.getElementById('credit-pin').value;
 
+    // 2. Отправляем fetch-запрос на ваш бэкенд-роут
     const res = await fetch('/api/accounts/credit', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ targetAccountId, amount, paymentsCount, autoWithdrawal, pinCode })});
-      const data = await res.json();
-      if(data.status) { 
-        await Swal.fire({title: 'Кредит', text: "Кредит одобрен! Деньги зачислены на технический счет #" + data.creditAccountId, icon: 'sucess', confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'});
+      // Маппим ваши оригинальные фронтенд-переменные в ключи, которые ожидает бэкенд-сервис
+      body: JSON.stringify({ 
+        accountId: targetAccountId, // targetAccountId конвертируется в accountId для бэкенда
+        amount: parseFloat(amount),  // явно приводим к числу
+        termMonths: parseInt(paymentsCount, 10), // paymentsCount конвертируется в termMonths
+        autoRepay: autoWithdrawal,   // autoWithdrawal конвертируется в autoRepay
+        pinCode: pinCode,            // передаем пин-код для верификации, если он нужен в сервисе
+        rate: 0.1                    // дефолтная ставка (10%), если на фронтенде нет такого поля
+      })
+    });
+    
+    const data = await res.json();
+    
+    // 3. Обработка ответа от сервера
+    if(data.success || data.status) { // Проверяем оба флага для надежности
+        // ИСПРАВЛЕНО: 'sucess' изменено на валидное 'success' (теперь окно сработает и не упадет в ошибку)
+        await Swal.fire({
+          title: 'Кредит', 
+          text: "Кредит одобрен! Деньги зачислены на счет #" + (data.creditId || data.creditAccountId), 
+          icon: 'success', 
+          confirmButtonColor: '#3085d6', 
+          confirmButtonText: 'Ок'
+        });
+
         Toastify({
           text: `Вы взяли кредит`,
-          duration:3000,
+          duration: 3000,
           style: { background: "rgb(58, 245, 11)" }
         }).showToast();
          
-        loadData(); 
-      } else { 
-        await Swal.fire({title: 'Кредит', text: "Ошибка", icon: 'warning', iconColor:"orange", confirmButtonColor: '#3085d6', confirmButtonText: 'Ок'});
-        console.error("Ошибка: " + data.message); 
-      }
+        if (typeof loadData === 'function') loadData(); // Безопасный вызов обновления данных
+    } else { 
+        await Swal.fire({
+          title: 'Кредит', 
+          text: data.error || data.message || "Ошибка оформления кредита", 
+          icon: 'warning', 
+          iconColor: "orange", 
+          confirmButtonColor: '#3085d6', 
+          confirmButtonText: 'Ок'
+        });
+        console.error("Ошибка: " + (data.error || data.message)); 
     }
-    document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-      const logOut = await Swal.fire({title: 'Выход', text: 'Вы подтверждаете выход из аккаунта?', icon: 'warning', iconColor:"orange", showCancelButton: true, confirmButtonColor: '#d63030', cancelButtonColor: '#46d630', confirmButtonText: 'Да, выйти', cancelButtonText: 'Отмена'}).then((result) => {return result;});
-      if(!logOut.isConfirmed) return
-      await Toastify({ text: `Выход из акканта`, duration:3000, style: { background: "rgb(245, 128, 11)" }}).showToast();
-      console.log(await fetch('/api/users/logout', { method: 'POST' }));
-      window.location.href = '/login.html';
-    });
+}
+
+// Обработчик кнопки выхода из системы
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  const logOut = await Swal.fire({
+    title: 'Выход', 
+    text: 'Вы подтверждаете выход из аккаунта?', 
+    icon: 'warning', 
+    iconColor: "orange", 
+    showCancelButton: true, 
+    confirmButtonColor: '#d63030', 
+    cancelButtonColor: '#46d630', 
+    confirmButtonText: 'Да, выйти', 
+    cancelButtonText: 'Отмена'
+  }).then((result) => { return result; });
+  
+  if(!logOut.isConfirmed) return;
+  
+  await Toastify({ text: `Выход из аккаунта`, duration: 3000, style: { background: "rgb(245, 128, 11)" }}).showToast();
+  
+  try {
+    await fetch('/api/users/logout', { method: 'POST' });
+  } catch (e) {
+    console.error('Ошибка сети при логауте:', e.message);
+  }
+  
+  // ИСПРАВЛЕНО: перенаправление на чистый роут без расширения .html
+  window.location.href = '/home.html';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     window.onload = loadData;
     let user2FaActive = false;
+
   async function syncProfileSectionData() {
     try {
       const response = await fetch('/api/users/profile');
@@ -233,8 +303,7 @@ let currentUsername = "";
         return;
       }
       
-      const result = await response.json(); // СТРОКА 444 (теперь тут безопасно)
-      
+      const result = await response.json();
       if (result.status && result.user) {
         if (result.user.avatar) {
           document.getElementById('user-avatar').src = result.user.avatar;
@@ -480,3 +549,68 @@ let currentUsername = "";
       console.error("Ошибка загрузки истории операций:", err);
     }
   }
+  async function executeCreateCredit() {
+  try {
+    // 1. Извлекаем элементы DOM
+    const accountIdField = document.getElementById('credit-accountId');
+    const amountField = document.getElementById('credit-amount');
+    const autoRepayField = document.getElementById('credit-autoRepay');
+    const rateField = document.getElementById('credit-rate');
+    const termMonthsField = document.getElementById('credit-termMonths');
+
+    // Проверка на случай, если элементы не найдены в DOM (чтобы скрипт не падал)
+    if (!accountIdField || !amountField) {
+      console.error('Критические элементы формы кредита не найдены в HTML дерева.');
+      return;
+    }
+
+    // 2. Формируем чистые переменные
+    const accountId = accountIdField.value;
+    const amount = parseFloat(amountField.value);
+    const autoRepay = autoRepayField ? autoRepayField.checked : false; // Чекбоксы проверяются через .checked
+    const rate = rateField ? parseFloat(rateField.value) : 0.1;
+    const termMonths = termMonthsField ? parseInt(termMonthsField.value, 10) : 12;
+
+    // Простая клиентская валидация перед отправкой
+    if (!accountId || isNaN(amount) || amount <= 0) {
+      Swal.fire('Внимание', 'Пожалуйста, заполните номер счета и корректную сумму', 'warning');
+      return;
+    }
+
+    // 3. Отправляем fetch-запрос на бэкенд-роут игрового банка
+    const response = await fetch('/api/account/create-credit', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json'
+        // Если вы используете JWT или сессии, сюда может потребоваться передать токен авторизации
+      },
+      body: JSON.stringify({
+        accountId,
+        amount,
+        autoRepay,
+        rate,
+        termMonths
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ошибка сервера: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    // 4. Обработка ответа от бэкенда
+    if (result.success) {
+      Swal.fire('Успех!', result.message || 'Кредит успешно оформлен', 'success').then(() => {
+        // Перенаправляем пользователя на страницу счетов, чтобы увидеть обновленный баланс
+        location.href = '/accounts'; 
+      });
+    } else {
+      Swal.fire('Ошибка оформления', result.error || 'Не удалось выдать кредит', 'error');
+    }
+
+  } catch (error) {
+    console.error('Ошибка выполнения executeCreateCredit:', error);
+    Swal.fire('Критическая ошибка', 'Не удалось связаться с сервером банка', 'error');
+  }
+}

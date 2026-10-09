@@ -1,5 +1,6 @@
 node_modules/
-citybank.db
 .env
+database/citybank.db
+public/uploads/
 logs/
-avatars/
+*.log

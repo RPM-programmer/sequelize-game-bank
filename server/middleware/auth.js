@@ -1,6 +1,4 @@
 const jwt = require('jsonwebtoken');
-
-// 📋 МИДЛВАРЬ ДЛЯ СТРАНИЦ (.html): Если не авторизован — жёстко перенаправляет на вход
 function verifyPageSession(req, res, next) {
   const token = req.cookies.token;
   if (!token) {
@@ -15,8 +13,6 @@ function verifyPageSession(req, res, next) {
     return res.redirect('/login.html');
   }
 }
-
-// 🌐 МИДЛВАРЬ ДЛЯ API (/api/*): Никогда не делает редирект, отдаёт только понятный JSON
 function verifyApiSession(req, res, next) {
   const token = req.cookies.token;
   if (!token) {
@@ -30,5 +26,4 @@ function verifyApiSession(req, res, next) {
     return res.status(403).json({ status: false, statusCode: -2, message: 'Сессия устарела. Войдите снова.' });
   }
 }
-
 module.exports = { verifyPageSession, verifyApiSession };

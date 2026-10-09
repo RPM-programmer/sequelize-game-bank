@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/init-db');
 const Account = require('./Account');
-
 const Credit = sequelize.define('credit', {
   id: {
     type: DataTypes.INTEGER,
@@ -32,8 +31,6 @@ const Credit = sequelize.define('credit', {
     defaultValue: false
   }
 });
-
 Account.hasMany(Credit, { foreignKey: 'account_id' });
 Credit.belongsTo(Account, { foreignKey: 'account_id', as: 'linkedAccount' });
-
 module.exports = Credit;

@@ -1,7 +1,5 @@
-// database/models/Transaction.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/init-db');
-
 module.exports = sequelize.define('transaction_log', {
   id: {
     type: DataTypes.INTEGER,
@@ -17,7 +15,7 @@ module.exports = sequelize.define('transaction_log', {
     allowNull: false
   },
   sender_or_receiver: {
-    type: DataTypes.STRING, // Никнейм контрагента (для переводов) или описание
+    type: DataTypes.STRING,
     allowNull: true
   },
   amount: {

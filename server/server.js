@@ -5,7 +5,7 @@ const Account = require('../database/models/Account');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-
+const logger = require("custom-color-logs").print;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const dir = './public/uploads/avatars/';
@@ -35,10 +35,9 @@ function verifySession(req, res, next) {
   if (!token) {
     return res.status(401).json({ status: false, statusCode: -2, message: 'Доступ запрещен. Вы не авторизованы.' });
   }
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Записываем { name: "игрок" } в запрос
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(403).json({ status: false, statusCode: -2, message: 'Сессия устарела. Войдите снова.' });
@@ -51,7 +50,6 @@ module.exports = function registerRoutes(app) {
       const { name } = req.body;
       const temporarySecret = otplib.authenticator.generateSecret();
       const otpauthUrl = otplib.authenticator.keyuri(name || 'User', 'City-Bank', temporarySecret);
-
       return res.json({ status: true, secret: temporarySecret, otpauthUrl: otpauthUrl });
     } catch (err) {
       return res.status(500).json({ status: false, message: err.message });
@@ -61,11 +59,9 @@ module.exports = function registerRoutes(app) {
     try {
       const otplib = require('otplib');
       const { secret, code } = req.body;
-
       if (!secret || !code) {
         return res.json({ status: false, message: 'Введите 6-значный код подтверждения' });
       }
-
       const isValid = otplib.authenticator.check(code, secret);
       if (isValid) {
         return res.json({ status: true, message: 'Код успешно подтвержден' });
@@ -80,11 +76,8 @@ module.exports = function registerRoutes(app) {
     if (!req.file) {
       return res.status(400).json({ status: false, statusCode: -2, message: 'Файл не загружен' });
     }
-    
-    // Формируем веб-путь к картинке
     const avatarUrl = `/uploads/avatars/${req.file.filename}`;
     const result = await usersHub.changeAvatar(req.user.name, avatarUrl);
-    
     return res.json(result);
   });
   app.get('/api/users/profile', verifySession, async (req, res) => {
@@ -122,7 +115,6 @@ module.exports = function registerRoutes(app) {
     }
     const sessionToken = jwt.sign({ name: name }, process.env.JWT_SECRET, { expiresIn: '2h' });
     res.cookie('token', sessionToken, { httpOnly: true, maxAge: 2 * 60 * 60 * 1000 });
-    
     return res.json(result);
   });
   app.post('/api/users/logout', (req, res) => {
@@ -148,10 +140,7 @@ module.exports = function registerRoutes(app) {
   });
   app.delete('/api/accounts/:id', verifySession, async (req, res) => {
     try {
-      // Вызываем микро-сервис удаления счета
       const result = await accountsHub.delete(req.params.id, req.user.name);
-      
-      // КРИТИЧЕСКИ ВАЖНО: всегда возвращаем объект с флагом статуса в JSON
       if (!result.status) {
         return res.status(400).json({
           status: false,
@@ -159,14 +148,12 @@ module.exports = function registerRoutes(app) {
           message: result.message || "Не удалось удалить счет"
         });
       }
-      
       return res.json({ status: true, statusCode: 1, message: "Счет успешно удален" });
     } catch (err) {
-      console.error("Ошибка роута удаления счета:", err.message);
+      console.log(logger.ServerError("Ошибка роута удаления счета:", err.message))
       return res.status(500).json({ status: false, statusCode: -10, message: "Внутренняя ошибка сервера" });
     }
   });
-
   app.post('/api/accounts/transfer', verifySession, async (req, res) => {
     const { fromId, toId, amount, pinCode, totpCode } = req.body;
     const result = await accountsHub.transfer(fromId, toId, amount, pinCode, totpCode);
@@ -179,16 +166,12 @@ module.exports = function registerRoutes(app) {
   });
   app.post('/api/admin/accounts/:id/status', verifySession, async (req, res) => {
     if (req.user.name !== 'root') return res.status(403).json({ status: false, statusCode: -2, message: 'Отказано в доступе' });
-    
-    // 🔑 Вызываем ровно то имя, которое отдает хаб accounts.js
     const result = await accountsHub.changeAccountStatus(req.params.id, req.body.active);
     return res.json(result);
   });
-
   app.post('/api/admin/accounts/:id/modify', verifySession, async (req, res) => {
     if (req.user.name !== 'root') return res.status(403).json({ status: false, statusCode: -2, message: 'Отказано в доступе' });
     const { amount, type } = req.body;
-    
     let result;
     if (type === 'add') {
       result = await accountsHub.addManny(req.params.id, amount);
