@@ -1,9 +1,10 @@
+const path = require("path");
 const bcrypt = require('bcrypt');
-const Account = require('../../models/Account');
-const User = require('../../models/User');
-const Transaction = require('../../models/Transaction');
-const sequelize = require('../../config/init-db');
-const { sendBotNotification } = require('../bot/bot');
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
+const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
+const Transaction = require(path.join(__dirname, '..', '..', 'models', 'Transaction'));
+const sequelize = require(path.join(__dirname, '..', '..', 'config', 'init-db'));
+const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot'));
 const logger = require("custom-color-logs").print;
 module.exports = async function transferManny(fromId, toId, amount, pinCode, totpCode = null) {
   const t = await sequelize.transaction();

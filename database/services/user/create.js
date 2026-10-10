@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const User = require('../../models/User');
+const path = require("path");
+const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
 const nodemailer = require('nodemailer');
 const { sendBotNotification } = require('../bot/bot');
 module.exports = async function createUser(data) {

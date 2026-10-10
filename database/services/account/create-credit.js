@@ -1,6 +1,7 @@
-const Account = require('./../../models/Account');
-const Credit = require('./../../models/Credit');
-const sequelize = require('./../../config/init-db');
+const path = require("path");
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
+const Credit = require(path.join(__dirname, '..', '..', 'models', 'Credit'));
+const sequelize = require(path.join(__dirname, '..', '..', 'config', 'init-db'));
 async function createCredit({ accountId, amount, autoRepay = false, rate = 0.1, termMonths = 12 }) {
   const numericAmount = parseFloat(amount);
   const numericRate = parseFloat(rate);

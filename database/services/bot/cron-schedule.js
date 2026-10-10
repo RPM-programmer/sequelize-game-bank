@@ -1,10 +1,11 @@
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
-const { Op } = require('sequelize'); // Явный импорт операторов Sequelize
-const Account = require('../../models/Account');
-const Credit = require('../../models/Credit');
-const User = require('../../models/User');
-const sequelize = require('../../config/init-db');
+const { Op } = require('sequelize');
+const path = require("path");
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
+const Credit = require(path.join(__dirname, '..', '..', 'models', 'Credit'));
+const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
+const sequelize = require(path.join(__dirname, '..', '..', 'config', 'init-db'));
 const logger = require("custom-color-logs").print;
 const transporter = nodemailer.createTransport({
   service: 'gmail',

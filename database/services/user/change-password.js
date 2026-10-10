@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
-const User = require('../../models/User');
+const path = require("path");
+const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
 module.exports = async function changePassword(name, oldPassword, newPassword, totp = null) {
   try {
     const user = await User.findByPk(name);

@@ -36,5 +36,9 @@ const app = (async function initBank(){
     }
 })();
 
+/**
+ * вызов функции BANK() возращает готовый express
+*/
+
 // Далее ваш код
 ```

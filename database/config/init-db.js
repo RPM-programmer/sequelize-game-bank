@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 const path = require('path');
 const fs = require('fs');
-const dbDir = path.resolve(__dirname, '../');
+const dbDir = path.resolve(__dirname, '..');
 const dbPath = path.join(dbDir, 'citybank.db');
 const logger = require("custom-color-logs").print;
 if (!fs.existsSync(dbDir)) {

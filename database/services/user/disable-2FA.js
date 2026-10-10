@@ -1,5 +1,6 @@
-const User = require('../../models/User');
-const { sendBotNotification } = require('../bot/bot');
+const path = require("path");
+const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
+const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot'));
 module.exports = async function disable2FA(name) {
   try {
     const user = await User.findByPk(name);

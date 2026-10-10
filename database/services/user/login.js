@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
-const User = require('../../models/User');
-const { sendBotNotification } = require('../bot/bot');
+const path = require("path");
+const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
+const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot'));
 const logger = require("custom-color-logs").print;
 module.exports = async function loginUser(name, password, totpCode = null) {
   try {

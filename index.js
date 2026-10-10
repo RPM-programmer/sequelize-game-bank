@@ -1,20 +1,21 @@
 const logger = require("custom-color-logs").print;
 console.log(logger.ServerBankInfo("Модуль банка запущен!"))
 require('dotenv').config();
+const path = require("path")
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-const sequelize = require('./database/config/init-db');
+const sequelize = require(path.join(__dirname, 'database', 'config', 'init-db'));
 const User = require('./database/models/User');
-const { writeTemplatesIfNotExist } = require('./database/services/bot/write');
-const registerRoutes = require('./server/server');
-const Transaction = require('./database/models/Transaction'); 
+const { writeTemplatesIfNotExist } = require(path.join(__dirname, 'database', 'services', 'bot', 'write'));
+const registerRoutes = require(path.join(__dirname, 'server', 'server'));
+const Transaction = require(path.join(__dirname, 'database', 'models', 'Transaction')); 
 const app = express();
-const path = require("path")
-const { verifySession } = require('./server/server');
+
+const { verifySession } = require(path.join(__dirname, 'server', 'server'));
 app.use(express.json());
 app.use(cookieParser());
-require('./database/services/bot/cron-schedule');
+require(path.join(__dirname, 'database', 'services', 'bot', 'cron-schedule'));
 async function Bank() {
   try {
     await sequelize.sync();
@@ -37,10 +38,10 @@ async function Bank() {
     });
     console.log(logger.ServerBankInfo(`Супер пользвотель создан`))
     const configuredApp = registerRoutes(app);
-    app.use('/css', express.static(path.join(__dirname, 'public/css')));
-    app.use('/js', express.static(path.join(__dirname, 'public/js')));
-    app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-    const { verifyPageSession } = require('./server/middleware/auth');
+    app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
+    app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
+    app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+    const { verifyPageSession } = require(path.join(__dirname, 'server', 'middleware', 'auth'));
     const pages = ['general.html', 'profile.html', 'accounts.html', 'transfer.html', 'history.html', 'credit.html', 'admin.html'];
     pages.forEach(page => {
       app.get(`/${page}`, verifyPageSession, (req, res) => {

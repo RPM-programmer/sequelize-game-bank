@@ -1,5 +1,6 @@
-const Account = require('../../models/Account');
-const Transaction = require('../../models/Transaction');
+const path = require("path")
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
+const Transaction = require(path.join(__dirname, '..', '..', 'models', 'Transaction'));
 module.exports = async function getAccountLogs(username) {
   try {
     const myAccounts = await Account.findAll({

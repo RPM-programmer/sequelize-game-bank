@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/init-db');
+const path = require("path");
+const sequelize = require(path.join(__dirname, '..', 'config', 'init-db'));
 const User = sequelize.define('user', {
   name: {
     type: DataTypes.STRING,
@@ -41,7 +42,7 @@ const User = sequelize.define('user', {
   avatar: {
     type: DataTypes.STRING,
     allowNull: true,
-    defaultValue: '/uploads/avatars/default.png'
+    defaultValue: path.join(__dirname, '..', '..', 'uploads', 'avatars', 'default.png')
   }
 });
 module.exports = User;
