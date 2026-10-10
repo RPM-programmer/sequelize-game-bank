@@ -1,12 +1,12 @@
 {
   "name": "sequelize-game-bank",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Sequelize-based gaming economy and banking system featuring user profiles, credits, admin management, and detailed transaction history.",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "start": "node test.js",
-    "ship":"npm publish"
+    "ship": "npm publish"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
