@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node test.js"
+    "start": "node test.js",
+    "ship":"npm publish"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

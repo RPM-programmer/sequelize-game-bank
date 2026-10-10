@@ -4,3 +4,4 @@ database/citybank.db
 public/uploads/
 logs/
 *.log
+.npmrc
