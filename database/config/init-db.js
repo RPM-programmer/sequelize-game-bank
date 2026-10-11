@@ -25,9 +25,9 @@ const sequelize = new Sequelize({
   define: {
     timestamps: true
   },
-  dialectOptions:{
+  /*dialectOptions:{
     mode: 2,
-  },
+  },*/
   retry:{
     max: 5,
   }

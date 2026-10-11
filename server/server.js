@@ -210,9 +210,22 @@ module.exports = function registerRoutes(app) {
     const result = await accountsHub.getLogs(req.user.name);
     return res.json(result);
   });
-
-
-
+  app.post('/api/terminal/login', async(req, res)=>{
+    if(!req.body) return res.sendStatus(400)
+    const id = req.body.id;
+    const pincode = req.body.pincode;
+    const card = req.body.card;
+    const result = await accountsHub.linkACard(card, id, pincode)
+    if(!result.status) return res.sendStatus(422)
+    return res.sendStatus(200);
+  });
+  app.post('/api/terminal/transfer', async(req, res)=>{
+    const card = req.body.card;
+    const to = req.body.to;
+    const pincode = req.body.pincode;
+    const manny = req.body.pinCode;
+    const result = await accountsHub.cardTransfer(card, to, manny, pincode)
+  });
   return app;
 };
 module.exports.verifySession = verifySession;

@@ -9,5 +9,7 @@ module.exports = {
   findManny: require(path.join(__dirname, 'account', 'find-manny')),
   creatCredit: require(path.join(__dirname, 'account', 'create-credit')),
   getLogs: require(path.join(__dirname, 'account', 'logs')),
-  changeAccountStatus: require(path.join(__dirname, 'account', 'change-status')) 
+  changeAccountStatus: require(path.join(__dirname, 'account', 'change-status')),
+  linkACard: require(path.join(__dirname, 'account', 'linkACard')),
+  cardTransfer: require(path.join(__dirname, 'account', 'cardTransfer'))
 };

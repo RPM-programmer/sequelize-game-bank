@@ -12,10 +12,19 @@ module.exports = async function createAccount(username, pinCode, enable2FA) {
       pin_code: hashedPin,
       manny: 0.00,
       active: true,
-      two_fa_status: enable2FA
+      two_fa_status: enable2FA,
+      cardNumber:null
     });
     return { status: true, statusCode: 1, accountId: newAccount.id };
   } catch (err) {
+    console.log(err)
+
+
+
+
+
+
+    
     return { status: false, statusCode: -10, message: err.message };
   }
 };

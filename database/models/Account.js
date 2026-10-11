@@ -35,6 +35,11 @@ const Account = sequelize.define('account', {
     allowNull: false,
     defaultValue: false,
     field: '2FA-status'
+  },
+  cardNumber:{
+    type:DataTypes.STRING,
+    allowNull:true,
+    unique:true
   }
 });
 User.hasMany(Account, { foreignKey: 'user', sourceKey: 'name' });

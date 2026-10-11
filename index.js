@@ -11,11 +11,9 @@ const { writeTemplatesIfNotExist } = require(path.join(__dirname, 'database', 's
 const registerRoutes = require(path.join(__dirname, 'server', 'server'));
 const Transaction = require(path.join(__dirname, 'database', 'models', 'Transaction')); 
 const app = express();
-
 const { verifySession } = require(path.join(__dirname, 'server', 'server'));
 app.use(express.json());
 app.use(cookieParser());
-require(path.join(__dirname, 'database', 'services', 'bot', 'cron-schedule'));
 async function Bank() {
   try {
     await sequelize.sync();
@@ -53,6 +51,8 @@ async function Bank() {
     app.get('/home.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'home.html')));
     app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'icon', 'icon.png')));
     app.get('/', (req, res) => res.redirect('/home.html'));
+
+    require(path.join(__dirname, 'database', 'services', 'bot', 'cron-schedule'));
     return configuredApp;
   } catch (err) {
     console.log(logger.ServerBankError("Критическая ошибка инициализации модулей", err));
