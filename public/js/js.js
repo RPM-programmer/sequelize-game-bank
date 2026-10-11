@@ -2,8 +2,6 @@
 const toastifyScript = document.createElement('script');
 toastifyScript.src = 'https://cdn.jsdelivr.net/npm/toastify-js';
 document.head.append(toastifyScript);
-
-
 let currentUsername = "";
 
   function showTab(tabId) {
@@ -12,6 +10,66 @@ let currentUsername = "";
     document.getElementById(tabId).classList.add('active');
     event.target.classList.add('active');
   }
+
+
+
+
+
+  window.tippy('#general', {
+    content: "Главная",
+    placement:'top-end',
+    arrow: false,
+    animation:'scale-extreme',
+    theme:"light"
+  });
+  window.tippy('#acccount', {
+    content: "Щета",
+    placement:'top-end',
+    arrow: false,
+    animation:'scale-extreme',
+    theme:"light"
+  });
+  window.tippy('#transfer', {
+    content: "Перевод",
+    placement:'top-end',
+    arrow: false,
+    animation:'scale-extreme',
+    theme:"light"
+  });
+  window.tippy('#history', {
+    content: "История",
+    placement:'top-end',
+    arrow: false,
+    animation:'scale-extreme',
+    theme:"light"
+  });
+  window.tippy('#credit', {
+    content: "Кредит",
+    placement:'top-end',
+    arrow: false,
+    animation:'scale-extreme',
+    theme:"light"
+  });
+  window.tippy('#profile', {
+    content: "Редактировать профиль",
+    placement:'top-end',
+    arrow: false,
+    animation:'scale-extreme',
+    theme:"light"
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
   async function loadData() {
     try {
       let response = await fetch('/api/accounts/my');
@@ -97,6 +155,13 @@ let currentUsername = "";
       let profileRes = await fetch('/api/users/profile');
       let profileData = await profileRes.json();
       const userAvatar = document.getElementById('user-avatar');
+      window.tippy("#user-avatar", {
+        content:`<span style='color:blue'>${currentUsername.toLocaleUpperCase()}</span> — <span style='color:lightgreen;'>${mannyData.totalManny.toFixed(2)}</span>`,
+        placement:"right",
+        allowHTML:true,
+        theme:'user-info',
+        arrow:false
+      })
       const userAvatar2 = document.getElementById('user-avatar2');
       if (profileData.status && profileData.user && profileData.user.avatar && userAvatar) {
         userAvatar.src = profileData.user.avatar;
@@ -120,6 +185,33 @@ let currentUsername = "";
       });
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   async function openCreateAccountModal() {
     const pin = await window.Swal.fire({title: 'Создание щёта', text: 'Введите надёжный пин-код!', icon: 'question', iconColor:"blue", input:"number", inputAttributes: { autocapitalize: "off" }, preConfirm:async(pincode)=>{return pincode}, confirmButtonText: 'ОК', confirmButtonColor: '#3085d6', background:'#ffffffaf'})
     if (!pin.value) return;
@@ -191,33 +283,25 @@ let currentUsername = "";
 
 
 async function applyForCredit() {
-    // 1. Извлекаем значения из ваших оригинальных ID элементов HTML
     const targetAccountId = document.getElementById('credit-target').value;
     const amount = document.getElementById('credit-amount').value;
     const paymentsCount = document.getElementById('credit-payments').value;
     const autoWithdrawal = document.getElementById('credit-auto').checked;
     const pinCode = document.getElementById('credit-pin').value;
-
-    // 2. Отправляем fetch-запрос на ваш бэкенд-роут
     const res = await fetch('/api/accounts/credit', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      // Маппим ваши оригинальные фронтенд-переменные в ключи, которые ожидает бэкенд-сервис
       body: JSON.stringify({ 
-        accountId: targetAccountId, // targetAccountId конвертируется в accountId для бэкенда
-        amount: parseFloat(amount),  // явно приводим к числу
-        termMonths: parseInt(paymentsCount, 10), // paymentsCount конвертируется в termMonths
-        autoRepay: autoWithdrawal,   // autoWithdrawal конвертируется в autoRepay
-        pinCode: pinCode,            // передаем пин-код для верификации, если он нужен в сервисе
-        rate: 0.1                    // дефолтная ставка (10%), если на фронтенде нет такого поля
+        accountId: targetAccountId,
+        amount: parseFloat(amount),
+        termMonths: parseInt(paymentsCount, 10),
+        autoRepay: autoWithdrawal,
+        pinCode: pinCode,
+        rate: 0.1
       })
     });
-    
     const data = await res.json();
-    
-    // 3. Обработка ответа от сервера
-    if(data.success || data.status) { // Проверяем оба флага для надежности
-        // ИСПРАВЛЕНО: 'sucess' изменено на валидное 'success' (теперь окно сработает и не упадет в ошибку)
+    if(data.success || data.status) {
         await Swal.fire({
           title: 'Кредит', 
           text: "Кредит одобрен! Деньги зачислены на счет #" + (data.creditId || data.creditAccountId), 
@@ -232,7 +316,7 @@ async function applyForCredit() {
           style: { background: "rgb(58, 245, 11)" }
         }).showToast();
          
-        if (typeof loadData === 'function') loadData(); // Безопасный вызов обновления данных
+        if (typeof loadData === 'function') loadData();
     } else { 
         await Swal.fire({
           title: 'Кредит', 
@@ -245,8 +329,6 @@ async function applyForCredit() {
         console.error("Ошибка: " + (data.error || data.message)); 
     }
 }
-
-// Обработчик кнопки выхода из системы
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   const logOut = await Swal.fire({
     title: 'Выход', 
@@ -269,8 +351,6 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   } catch (e) {
     console.error('Ошибка сети при логауте:', e.message);
   }
-  
-  // ИСПРАВЛЕНО: перенаправление на чистый роут без расширения .html
   window.location.href = '/home.html';
 });
 
