@@ -8,7 +8,7 @@ const fs = require('fs');
 const logger = require("custom-color-logs").print;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const dir = './public/uploads/avatars/';
+    const dir = path.join(__dirname, '..', 'public', 'uploads', 'avatars');
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },

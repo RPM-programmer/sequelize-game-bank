@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/init-db');
 const path = require("path");
+const sequelize = require(path.join(__dirname, '..', 'config', 'init-db'));
 const User = require(path.join(__dirname, 'User'));
 const Account = sequelize.define('account', {
   id: {

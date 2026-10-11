@@ -1,13 +1,13 @@
-// database/services/accounts.js
+const path = require("path");
 module.exports = {
-  create: require('./account/create'),
-  delete: require('./account/delete'),
-  changePincode: require('./account/change-pincode'),
-  transfer: require('./account/transfer'),
-  addManny: require('./account/add-manny'),
-  removeManny: require('./account/remove-manny'),
-  findManny: require('./account/find-manny'),
-  creatCredit: require('./account/create-credit'),
-  getLogs: require('./account/logs'),
-  changeAccountStatus: require('./account/change-status') 
+  create: require(path.join(__dirname, 'account', 'create')),
+  delete: require(path.join(__dirname, 'account', 'delete')),
+  changePincode: require(path.join(__dirname, 'account', 'change-pincode')),
+  transfer: require(path.join(__dirname, 'account', 'transfer')),
+  addManny: require(path.join(__dirname, 'account', 'add-manny')),
+  removeManny: require(path.join(__dirname, 'account', 'remove-manny')),
+  findManny: require(path.join(__dirname, 'account', 'find-manny')),
+  creatCredit: require(path.join(__dirname, 'account', 'create-credit')),
+  getLogs: require(path.join(__dirname, 'account', 'logs')),
+  changeAccountStatus: require(path.join(__dirname, 'account', 'change-status')) 
 };

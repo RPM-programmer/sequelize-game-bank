@@ -1,4 +1,5 @@
-const User = require('../../models/User');
+const path = require("path");
+const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
 module.exports = async function changeGmail(name, newGmail) {
   try {
     if (await User.findOne({ where: { user_gmail: newGmail } })) return { status: false, statusCode: -21 };
