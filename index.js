@@ -9,12 +9,12 @@ const sequelize = require(path.join(__dirname, 'database', 'config', 'init-db'))
 const User = require(path.join(__dirname, 'database', 'models', 'User'));
 const { writeTemplatesIfNotExist } = require(path.join(__dirname, 'database', 'services', 'bot', 'write'));
 const registerRoutes = require(path.join(__dirname, 'server', 'server'));
-const Transaction = require(path.join(__dirname, 'database', 'models', 'Transaction')); 
-const app = express();
+const Transaction = require(path.join(__dirname, 'database', 'models', 'Transaction'));
 const { verifySession } = require(path.join(__dirname, 'server', 'server'));
-app.use(express.json());
-app.use(cookieParser());
-async function Bank() {
+
+async function Bank(app) {
+  app.use(express.json());
+  app.use(cookieParser());
   try {
     await sequelize.sync();
     console.log(logger.ServerBankInfo("База данных синхронизирована."));
