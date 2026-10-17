@@ -1,5 +1,5 @@
 const path = require("path");
-const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account.js'));
 const logger = require("custom-color-logs").print;
 module.exports = async function linkACard(card, id, pin_code) {
     try {

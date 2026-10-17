@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const path = require("path");
-const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account.js'));
 module.exports = async function createAccount(username, pinCode, enable2FA) {
   try {
     if (!pinCode || pinCode.length > 8) {

@@ -1,5 +1,5 @@
 const path = require("path");
-const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
+const User = require(path.join(__dirname, '..', '..', 'models', 'User.js'));
 module.exports = async function changeAvatar(name, avatarUrl) {
   try {
     const user = await User.findByPk(name);

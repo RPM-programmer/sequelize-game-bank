@@ -1,5 +1,5 @@
 const path = require("path");
-const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account.js'));
 module.exports = async function mathManny(username) {
   try {
     const total = await Account.sum('manny', { where: { user: username } });

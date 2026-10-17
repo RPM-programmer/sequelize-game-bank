@@ -5,12 +5,12 @@ const path = require("path")
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-const sequelize = require(path.join(__dirname, 'database', 'config', 'init-db'));
-const User = require(path.join(__dirname, 'database', 'models', 'User'));
-const { writeTemplatesIfNotExist } = require(path.join(__dirname, 'database', 'services', 'bot', 'write'));
-const registerRoutes = require(path.join(__dirname, 'server', 'server'));
-const Transaction = require(path.join(__dirname, 'database', 'models', 'Transaction'));
-const { verifySession } = require(path.join(__dirname, 'server', 'server'));
+const sequelize = require(path.join(__dirname, 'database', 'config', 'init-db.js'));
+const User = require(path.join(__dirname, 'database', 'models', 'User.js'));
+const { writeTemplatesIfNotExist } = require(path.join(__dirname, 'database', 'services', 'bot', 'write.js'));
+const registerRoutes = require(path.join(__dirname, 'server', 'server.js'));
+const Transaction = require(path.join(__dirname, 'database', 'models', 'Transaction.js'));
+const { verifySession } = require(path.join(__dirname, 'server', 'server.js'));
 
 async function Bank(app) {
   app.use(express.json());

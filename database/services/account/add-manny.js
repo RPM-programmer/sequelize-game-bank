@@ -1,6 +1,6 @@
 const path = require("path");
-const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
-const Transaction = require(path.join(__dirname, '..', '..', 'models', 'Transaction'));
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account.js'));
+const Transaction = require(path.join(__dirname, '..', '..', 'models', 'Transaction.js'));
 module.exports = async function addManny(accountId, amount) {
   try {
     const acc = await Account.findByPk(accountId);

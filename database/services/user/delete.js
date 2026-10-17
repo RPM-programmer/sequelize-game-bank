@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const path = require("path");
-const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
+const User = require(path.join(__dirname, '..', '..', 'models', 'User.js'));
 module.exports = async function deleteUser(name, password, totp = null) {
   try {
     const user = await User.findByPk(name);

@@ -1,8 +1,8 @@
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const path = require("path");
-const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
-const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot'));
+const User = require(path.join(__dirname, '..', '..', 'models', 'User.js'));
+const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot.js'));
 module.exports = async function enable2FA(name) {
   try {
     const user = await User.findByPk(name);

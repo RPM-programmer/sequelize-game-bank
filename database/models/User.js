@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const path = require("path");
-const sequelize = require(path.join(__dirname, '..', 'config', 'init-db'));
+const sequelize = require(path.join(__dirname, '..', 'config', 'init-db.js'));
 const User = sequelize.define('user', {
   name: {
     type: DataTypes.STRING,

@@ -1,10 +1,10 @@
 const path = require("path");
 const bcrypt = require('bcrypt');
-const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
-const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
-const Transaction = require(path.join(__dirname, '..', '..', 'models', 'Transaction'));
-const sequelize = require(path.join(__dirname, '..', '..', 'config', 'init-db'));
-const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot'));
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account.js'));
+const User = require(path.join(__dirname, '..', '..', 'models', 'User.js'));
+const Transaction = require(path.join(__dirname, '..', '..', 'models', 'Transaction.js'));
+const sequelize = require(path.join(__dirname, '..', '..', 'config', 'init-db.js'));
+const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot.js'));
 const logger = require("custom-color-logs").print;
 async function getIdByCard(card) {
     const result = await Account.findOne({

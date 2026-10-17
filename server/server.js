@@ -1,8 +1,8 @@
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const User = require(path.join(__dirname, '..', 'database', 'models', 'User'));
-const Account = require(path.join(__dirname, '..', 'database', 'models', 'Account'));
+const User = require(path.join(__dirname, '..', 'database', 'models', 'User.js'));
+const Account = require(path.join(__dirname, '..', 'database', 'models', 'Account.js'));
 const multer = require('multer');
 const fs = require('fs');
 const logger = require("custom-color-logs").print;
@@ -27,8 +27,8 @@ const upload = multer({
   },
   limits: { fileSize: 2 * 1024 * 1024 } 
 });
-const usersHub = require(path.join(__dirname, '..', 'database', 'services', 'users'));
-const accountsHub = require(path.join(__dirname, '..', 'database', 'services', 'accounts'));
+const usersHub = require(path.join(__dirname, '..', 'database', 'services', 'users.js'));
+const accountsHub = require(path.join(__dirname, '..', 'database', 'services', 'accounts.js'));
 
 function verifySession(req, res, next) {
   const token = req.cookies.token;

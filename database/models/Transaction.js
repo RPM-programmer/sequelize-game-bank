@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const path = require("path");
-const sequelize = require(path.join(__dirname, '..', 'config', 'init-db'));
+const sequelize = require(path.join(__dirname, '..', 'config', 'init-db.js'));
 module.exports = sequelize.define('transaction_log', {
   id: {
     type: DataTypes.INTEGER,

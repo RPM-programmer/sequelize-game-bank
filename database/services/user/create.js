@@ -1,9 +1,9 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const path = require("path");
-const User = require(path.join(__dirname, '..', '..', 'models', 'User'));
+const User = require(path.join(__dirname, '..', '..', 'models', 'User.js'));
 const nodemailer = require('nodemailer');
-const { sendBotNotification } = require('../bot/bot');
+const { sendBotNotification } = require('../bot/bot.js');
 module.exports = async function createUser(data) {
   try {
     if (await User.findByPk(data.name)) return { status: false, statusCode: -20 };

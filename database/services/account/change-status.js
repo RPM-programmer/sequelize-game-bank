@@ -1,6 +1,6 @@
 const path = require("path");
-const Account = require(path.join(__dirname, '..', '..', 'models', 'Account'));
-const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot'));
+const Account = require(path.join(__dirname, '..', '..', 'models', 'Account.js'));
+const { sendBotNotification } = require(path.join(__dirname, '..', 'bot', 'bot.js'));
 module.exports = async function changeAccountStatus(accountId, isActive) {
   try {
     const [updatedCount] = await Account.update(
