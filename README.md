@@ -15,18 +15,17 @@
 
 ## 🚀 Установка
 
-Установите пакет через ваш любимый менеджер пакетов:
+Установите пакет через ваш менеджер пакетов:
 
 ```bash
 npm install sequelize-game-bank
+# или
+yarn add sequelize-game-bank
 ```
-
-## 💻 Быстрый старт
-
-Просто подключите модуль в ваше существующее Express-приложение:
-
+## Мажорный переход на v3.0.0 (Breaking Changes)
+### В v3.0.0 изменили инициализацию! Теперь не:
 ```javascript
-const BANK = require('./index.js');
+const BANK = require('sequelize-game-bank');
 
 const app = (async function initBank(){
     try {
@@ -35,10 +34,31 @@ const app = (async function initBank(){
         console.log("Ошибка при инициализации банка!");
     }
 })();
+//app.listen(3000);
+```
+### а:
+```javascript
+const BANK = require('sequelize-game-bank');
+const express = require("express");
+let cleanApp = express();
+const app = (async function init()=>{
+    return await BANK(cleanApp); 
+});
 
-/**
- * вызов функции BANK() возращает готовый express
-*/
+//app.listen(3000)
+```
 
-// Далее ваш код
+## 💻 Быстрый старт
+
+Просто подключите модуль в ваше существующее Express-приложение:
+
+```javascript
+const BANK = require('sequelize-game-bank');
+const express = require("express");
+let cleanApp = express();
+const app = (async function init()=>{
+    return await BANK(cleanApp); 
+});
+
+//app.listen(3000)
 ```

@@ -210,7 +210,7 @@ module.exports = function registerRoutes(app) {
     const result = await accountsHub.getLogs(req.user.name);
     return res.json(result);
   });
-  app.post('/api/terminal/login', async(req, res)=>{
+  app.post('/api/terminal/register', async(req, res)=>{
     if(!req.body) return res.sendStatus(400)
     const id = req.body.id;
     const pincode = req.body.pincode;
