@@ -1,7 +1,7 @@
 const logger = require("custom-color-logs").print;
 console.log(logger.ServerBankInfo("Модуль банка запущен!"))
-require('dotenv').config();
 const path = require("path")
+const setupEnv = require(path.join(__dirname, "config", "setup-env.js"));
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
