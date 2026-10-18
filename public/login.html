@@ -34,7 +34,7 @@
 
   <div id="login-error" class="error"></div>
   <button class="btn" onclick="submitLogin()">Войти в кабинет</button>
-  <p style="text-align: center; font-size: 14px; margin-top: 15px;"><a href="/register.html">Создать аккаунт</a></p>
+  <p style="text-align: center; font-size: 14px; margin-top: 15px;"><a href="/bank/register.html">Создать аккаунт</a></p>
 </div>
 
 <script>
@@ -46,7 +46,7 @@
     errBlock.style.display = 'none';
 
     try {
-      const response = await fetch('/api/users/login', {
+      const response = await fetch('/api/bank/users/login', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ name, password: pass, totpCode: totp || null })
@@ -54,7 +54,7 @@
       const result = await response.json();
 
       if (response.ok && result.status === true) {
-        window.location.href = 'general.html';
+        window.location.href = '/bank/general.html';
       } else if (result.require2FA) {
         document.getElementById('totp-block').style.display = 'block';
         errBlock.innerText = result.message;

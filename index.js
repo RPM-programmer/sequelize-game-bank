@@ -35,25 +35,33 @@ async function Bank(app) {
       }
     });
     console.log(logger.ServerBankInfo(`Супер пользвотель создан`))
-    const configuredApp = registerRoutes(app);
-    app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
-    app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
-    app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+    const gp = registerRoutes();
+    const get = gp.GET;
+    const post = gp.POST;
+    post.use('/css', express.static(path.join(__dirname, 'public', 'css')));
+    post.use('/js', express.static(path.join(__dirname, 'public', 'js')));
+    post.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
     const { verifyPageSession } = require(path.join(__dirname, 'server', 'middleware', 'auth'));
     const pages = ['general.html', 'profile.html', 'accounts.html', 'transfer.html', 'history.html', 'credit.html', 'admin.html'];
     pages.forEach(page => {
-      app.get(`/${page}`, verifyPageSession, (req, res) => {
+      get.get(`/${page}`, verifyPageSession, (req, res) => {
         res.sendFile(path.join(__dirname, 'public', page));
       });
     });
-    app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-    app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
-    app.get('/home.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'home.html')));
+    get.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+    get.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
+    get.get('/home.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'home.html')));
     app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'icon', 'icon.png')));
-    app.get('/', (req, res) => res.redirect('/home.html'));
+    get.get('/', (req, res) => res.redirect('/home.html'));
+
+
+
+
+    app.use("/bank", get);
+    app.use("/api/bank", post)
 
     require(path.join(__dirname, 'database', 'services', 'bot', 'cron-schedule'));
-    return configuredApp;
+    return app;
   } catch (err) {
     console.log(logger.ServerBankError("Критическая ошибка инициализации модулей", err));
     throw err;

@@ -239,7 +239,7 @@
     }
 
     try {
-      const response = await fetch(`/api/users/check-nik?name=${encodeURIComponent(nikInput)}`);
+      const response = await fetch(`/api/bank/users/check-nik?name=${encodeURIComponent(nikInput)}`);
       const result = await response.json();
 
       if (result.status === true && result.statusCode === 1) {
@@ -267,7 +267,7 @@
     }
 
     try {
-      const response = await fetch(`/api/users/check-gmail?gmail=${encodeURIComponent(gmailInput)}`);
+      const response = await fetch(`/api/bank/users/check-gmail?gmail=${encodeURIComponent(gmailInput)}`);
       const result = await response.json();
 
       if (result.status === true && result.statusCode === 1) {
@@ -317,7 +317,7 @@
       nextBtn.innerText = "Проверить токен 2FA";
       
       try {
-        const response = await fetch('/api/users/generate-temporary-2fa', {
+        const response = await fetch('/api/bank/users/generate-temporary-2fa', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ name: registrationPayload.name || document.getElementById('reg-nik').value.trim() })
@@ -376,7 +376,7 @@
     }
 
     try {
-      const response = await fetch('/api/users/verify-temporary-2fa', {
+      const response = await fetch('/api/bank/users/verify-temporary-2fa', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ 
@@ -418,7 +418,7 @@
     registrationPayload.userSurname = surname;
 
     try {
-      const response = await fetch('/api/users/register', {
+      const response = await fetch('/api/bank/users/register', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(registrationPayload)
@@ -426,8 +426,8 @@
       const result = await response.json();
 
       if (result.status === true && result.statusCode === 1) {
-        alert("🎉 Регистрация успешно завершена! Проверьте вашу почту для получения паролей и токенов.");
-        window.location.href = '/login.html';
+        alert("Регистрация успешно завершена! Проверьте вашу почту для получения паролей и токенов.");
+        window.location.href = '/bank/login.html';
       } else {
         errBlock.innerText = result.message || "Внутренняя ошибка сервера";
         errBlock.style.display = 'block';

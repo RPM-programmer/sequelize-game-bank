@@ -35,7 +35,7 @@ module.exports = async function transferManny(fromId, toId, amount, pinCode, tot
       await t.rollback();
       return { status: false, statusCode: -23, message: 'Неверный пароль счета отправителя' };
     }
-    if (fromAcc.user !== 'root' && parseFloat(fromAcc.manny) < numericAmount) {
+    if (parseFloat(fromAcc.manny) < numericAmount) {
       await t.rollback();
       return { status: false, statusCode: -11, message: 'Недостаточно средств на счете' };
     }

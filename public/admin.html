@@ -39,8 +39,8 @@
 <body>
 
 <div class="container">
-  <h2>👑 ЦЕНТРАЛЬНЫЙ ПУЛЬТ АДМИНИСТРАТОРА (ROOT)</h2>
-  <button class="btn" onclick="location.href='/general.html'" style="background:#6c757d;"><- В личный кабинет</button>
+  <h2>ЦЕНТРАЛЬНЫЙ ПУЛЬТ АДМИНИСТРАТОРА (ROOT)</h2>
+  <button class="btn" onclick="location.href='/bank/general.html'" style="background:#6c757d;"><- В личный кабинет</button>
 
   <!-- Интерактивная таблица всех счетов -->
   <table id="all-accounts-table">
@@ -90,7 +90,7 @@
   // Загрузка таблицы при старте страницы
   async function loadAdminDashboard() {
     try {
-      const response = await fetch('/api/admin/accounts/all');
+      const response = await fetch('/api/bank/admin/accounts/all');
       const result = await response.json();
 
       if (!response.ok || !result.status) {
@@ -128,7 +128,7 @@
   // Переключение статуса бана/разбана
   async function toggleAccountStatus(accountId, makeActive) {
     try {
-      const response = await fetch(`/api/admin/accounts/${accountId}/status`, {
+      const response = await fetch(`/api/bank/admin/accounts/${accountId}/status`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ active: makeActive })
@@ -169,7 +169,7 @@
 
     try {
       // Роут /modify работает через add-manny.js и remove-manny.js, которые НЕ шлют письма по ТЗ
-      const response = await fetch(`/api/admin/accounts/${accountId}/modify`, {
+      const response = await fetch(`/api/bank/admin/accounts/${accountId}/modify`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ amount, type })

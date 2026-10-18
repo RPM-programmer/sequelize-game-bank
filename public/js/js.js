@@ -1,20 +1,13 @@
-//import Toastifyt from 'https://cdn.jsdelivr.net/npm/toastify-js';
 const toastifyScript = document.createElement('script');
 toastifyScript.src = 'https://cdn.jsdelivr.net/npm/toastify-js';
 document.head.append(toastifyScript);
 let currentUsername = "";
-
   function showTab(tabId) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     event.target.classList.add('active');
   }
-
-
-
-
-
   window.tippy('#general', {
     content: "Главная",
     placement:'top-end',
@@ -57,22 +50,9 @@ let currentUsername = "";
     animation:'scale-extreme',
     theme:"light"
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
   async function loadData() {
     try {
-      let response = await fetch('/api/accounts/my');
+      let response = await fetch('/api/bank/accounts/my');
       if (response.status === 401 || response.status === 403) {
         window.Swal.fire({
           title: 'Внимание!',
@@ -83,11 +63,11 @@ let currentUsername = "";
           confirmButtonColor: '#3085d6',
           background:'#d6cb3089'
         });
-        window.location.href = '/login.html';
+        window.location.href = '/bank/login.html';
         return;
       }
       let result = await response.json();
-      let mannyRes = await fetch('/api/users/my-total-manny');
+      let mannyRes = await fetch('/api/bank/users/my-total-manny');
       let mannyData = await mannyRes.json();
       currentUsername = mannyData.username;
       const userDisplay = document.getElementById('user-display');
@@ -152,7 +132,7 @@ let currentUsername = "";
           }
         });
       }
-      let profileRes = await fetch('/api/users/profile');
+      let profileRes = await fetch('/api/bank/users/profile');
       let profileData = await profileRes.json();
       const userAvatar = document.getElementById('user-avatar');
       window.tippy("#user-avatar", {
@@ -185,38 +165,11 @@ let currentUsername = "";
       });
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   async function openCreateAccountModal() {
     const pin = await window.Swal.fire({title: 'Создание щёта', text: 'Введите надёжный пин-код!', icon: 'question', iconColor:"blue", input:"number", inputAttributes: { autocapitalize: "off" }, preConfirm:async(pincode)=>{return pincode}, confirmButtonText: 'ОК', confirmButtonColor: '#3085d6', background:'#ffffffaf'})
     if (!pin.value) return;
     const fa = await Swal.fire({title: 'Создание щёта', text: 'Включить индивидуальную 2FA-защиту транзакций для этого счета?', icon: 'question', iconColor:"blue", showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#3085d6', confirmButtonText: 'Да, включить', cancelButtonText: 'Нет, не включать'}).then((result) => {return result;});
-    const res = await fetch('/api/accounts', {
+    const res = await fetch('/api/bank/accounts', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ pinCode: pin.value, enableAccount2FA: fa.isConfirmed })
@@ -253,7 +206,7 @@ let currentUsername = "";
     const fa = await Swal.fire({title: 'Перевод', text: 'Вы подтверждаете перевод?', icon: 'question', iconColor:"blue", showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#3085d6', confirmButtonText: 'Да, перевести', cancelButtonText: 'Нет, не переводить'}).then((result) => {return result;});
     if(!fa.isConfirmed) return
 
-    const res = await fetch('/api/accounts/transfer', {
+    const res = await fetch('/api/bank/accounts/transfer', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ fromId, toId, amount, pinCode })
@@ -275,20 +228,13 @@ let currentUsername = "";
       console.error("Ошибка ["+data.statusCode+"]: " + data.message); 
     }
   }
-
-
-
-
-
-
-
 async function applyForCredit() {
     const targetAccountId = document.getElementById('credit-target').value;
     const amount = document.getElementById('credit-amount').value;
     const paymentsCount = document.getElementById('credit-payments').value;
     const autoWithdrawal = document.getElementById('credit-auto').checked;
     const pinCode = document.getElementById('credit-pin').value;
-    const res = await fetch('/api/accounts/credit', {
+    const res = await fetch('/api/bank/accounts/credit', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ 
@@ -347,48 +293,26 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   await Toastify({ text: `Выход из аккаунта`, duration: 3000, style: { background: "rgb(245, 128, 11)" }}).showToast();
   
   try {
-    await fetch('/api/users/logout', { method: 'POST' });
+    await fetch('/api/bank/users/logout', { method: 'POST' });
   } catch (e) {
     console.error('Ошибка сети при логауте:', e.message);
   }
-  window.location.href = '/home.html';
+  window.location.href = '/bank/home.html';
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     window.onload = loadData;
     let user2FaActive = false;
-
   async function syncProfileSectionData() {
     try {
-      const response = await fetch('/api/users/profile');
-      
-      // 🔑 ЗАЩИТА: Если бэкенд вернул ошибку (не 200 OK), не пытаемся парсить JSON
+      const response = await fetch('/api/bank/users/profile/settings');
       if (!response.ok) {
         console.warn("⚠️ [City-bank] Не удалось загрузить данные профиля, сервер вернул статус:", response.status);
         return;
       }
-      
       const result = await response.json();
       if (result.status && result.user) {
         if (result.user.avatar) {
           document.getElementById('user-avatar').src = result.user.avatar;
-        }
-        
+        } 
         user2FaActive = result.user.two_fa_status;
         const statusText = document.getElementById('2fa-current-status');
         const toggleBtn = document.getElementById('btn-toggle-2fa');
@@ -418,7 +342,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     formData.append('avatar', fileInput.files[0]);
 
     try {
-      const res = await fetch('/api/users/avatar', {
+      const res = await fetch('/api/bank/users/avatar', {
         method: 'POST',
         body: formData
       });
@@ -454,7 +378,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
       if (!totpCode) return;
     }
     try {
-      const res = await fetch('/api/users/change-password', {
+      const res = await fetch('/api/bank/users/change-password', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ oldPassword, newPassword, totpCode })
@@ -485,7 +409,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     }
 
     try {
-      const res = await fetch('/api/users/change-gmail', {
+      const res = await fetch('/api/bank/users/change-gmail', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ newGmail })
@@ -510,7 +434,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     }
   }
   async function toggleSystem2FA() {
-    const url = user2FaActive ? '/api/users/disable-2fa' : '/api/users/enable-2fa';
+    const url = user2FaActive ? '/api/bank/users/disable-2fa' : '/api/bank/users/enable-2fa';
     try {
       const res = await fetch(url, { method: 'POST' });
       const data = await res.json();
@@ -547,7 +471,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     const deleteAccountStatus = await Swal.fire({title: 'Удаление щёта', text: 'Вы действительно хотите удалить щёт?', icon: 'warning', iconColor:"orange", showCancelButton: true, confirmButtonColor: '#d63030', cancelButtonColor: '#46d630', confirmButtonText: 'Да, удалить', cancelButtonText: 'Отмена'}).then((result) => {return result;});    
     if (!deleteAccountStatus.isConfirmed) return;
     try {
-      const response = await fetch(`/api/accounts/${accountId}`, {
+      const response = await fetch(`/api/bank/accounts/${accountId}`, {
         method: 'DELETE'
       });
       if (!response.ok) {
@@ -583,7 +507,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   }
   async function loadTransactionLogs() {
     try {
-      const response = await fetch('/api/accounts/my-logs');
+      const response = await fetch('/api/bank/accounts/my-logs');
       if (!response.ok) return;
       const result = await response.json();
       const tbody = document.querySelector('#table-logs tbody');
@@ -658,7 +582,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     }
 
     // 3. Отправляем fetch-запрос на бэкенд-роут игрового банка
-    const response = await fetch('/api/account/create-credit', {
+    const response = await fetch('/api/bank/accounts/credit', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json'
@@ -683,7 +607,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     if (result.success) {
       Swal.fire('Успех!', result.message || 'Кредит успешно оформлен', 'success').then(() => {
         // Перенаправляем пользователя на страницу счетов, чтобы увидеть обновленный баланс
-        location.href = '/accounts'; 
+        location.href = '/bank/accounts.html'; 
       });
     } else {
       Swal.fire('Ошибка оформления', result.error || 'Не удалось выдать кредит', 'error');

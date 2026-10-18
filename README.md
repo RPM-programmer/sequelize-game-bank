@@ -1,6 +1,6 @@
 > # sequelize-game-bank
 
-<img src="./src/logo/icon.png" alt="sequelize-game-bank logo" width="160" height="160" style="border-radius: 12%; margin-bottom: 20px;" />
+<img src="https://github.com/RPM-programmer/sequelize-game-bank/blob/main/src/logo/icon.png?raw=true" alt="sequelize-game-bank logo" width="160" height="160" style="border-radius: 12%; margin-bottom: 20px;" />
 
 ## npm модуль для создания полноценного банка на express, sequelize (sqlite).
 
@@ -15,50 +15,80 @@
 
 ## 🚀 Установка
 
-Установите пакет через ваш менеджер пакетов:
+Установите пакет через менеджер пакетов:
 
 ```bash
 npm install sequelize-game-bank
 # или
 yarn add sequelize-game-bank
 ```
-## Мажорный переход на v3.0.0 (Breaking Changes)
-### В v3.0.0 изменили инициализацию! Теперь не:
-```javascript
-const BANK = require('sequelize-game-bank');
+## Установка и настройка (Инициализация)
 
-const app = (async function initBank(){
-    try {
-        return await BANK();
-    } catch {
-        console.log("Ошибка при инициализации банка!");
-    }
+Модуль `sequelize-game-bank` требует асинхронной инициализации базы данных и настройки роутов. 
+
+### 1. Настройка окружения (.env)
+Перед запуском обязательно добавьте в корневой `.env` файл вашего проекта параметры для создания суперпользователя банка (администратора):
+
+```env
+# Email для автоматического создания root-пользователя банка
+PORT=
+JWT_SECRET=
+ROOT_PASSWORD=
+GMAIL=
+GOOGLE_APP_PASSWORD=
+
+```
+
+### 2. Подключение в server.js проекта
+
+Так как модуль является асинхронным, его необходимо подключать **ДО** финальных обработчиков несуществующих маршрутов (404) и ошибок сервера (500). Поместите вызов модуля внутрь асинхронного блока:
+
+```javascript
+const express = require('express');
+const sequelize_game_bank = require('sequelize-game-bank');
+
+const app = express();
+
+
+(async () => {
+  try {
+    await sequelize_game_bank(app);
+
+    app.use((req, res) => {
+      res.status(404).send("<h1>404 - Страница не найдена</h1>");
+    });
+
+    app.use((err, req, res, next) => {
+      res.status(500).send("<h1>500 - Внутренняя ошибка сервера</h1>");
+    });
+
+  } catch (error) {
+  }
 })();
-//app.listen(3000);
+
+module.exports = { app };
 ```
-### а:
-```javascript
-const BANK = require('sequelize-game-bank');
-const express = require("express");
-let cleanApp = express();
-const app = (async function init()=>{
-    return await BANK(cleanApp); 
-});
+## 🌐 Маршрутизация и точки входа (v4.0.0)
 
-//app.listen(3000)
-```
+В версии 4.0.0 вся логика путей полностью изолирована внутри модуля и работает в автоматическом режиме. Разработчику или пользователю доступны всего **3 основные веб-страницы** для ручного перехода из браузера:
 
-## 💻 Быстрый старт
+* **`GET`** `/bank/home.html` — Главная приветственная страница банка.
+* **`GET`** `/bank/login.html` — Страница авторизации пользователей.
+* **`GET`** `/bank/register.html` — Страница регистрации новых аккаунтов.
 
-Просто подключите модуль в ваше существующее Express-приложение:
+---
 
-```javascript
-const BANK = require('sequelize-game-bank');
-const express = require("express");
-let cleanApp = express();
-const app = (async function init()=>{
-    return await BANK(cleanApp); 
-});
+### ⚙️ Как это работает изнутри (Автоматика модуля)
 
-//app.listen(3000)
-```
+Вам больше не нужно вручную настраивать эндпоинты в основном проекте `CITY`. После подключения модуля в `server.js` автоматически разворачиваются два изолированных роутера:
+
+1. **Интерфейс банка (Префикс `/bank`)**  
+   Автоматически управляет отображением всех внутренних страниц личного кабинета (панели управления, счета, переводы, кредиты, админка) и раздачей статических файлов (CSS, JS, загруженные аватарки).
+   
+2. **Серверное API (Префикс `/api/bank`)**  
+   Полностью берет на себя фоновый обмен JSON-данными между вашим фронтендом и базой данных Sequelize. На этот префикс автоматически завязаны все типы сетевых операций:
+   * Получение данных (`GET` запросы профилей, счетов, баланса и истории логов).
+   * Изменение состояния (`POST` запросы авторизации, переводов, кредитов и настройки 2FA).
+   * Удаление сущностей (`DELETE` запросы на закрытие игровых счетов).
+
+## Лицензия [ISC](LICENSE)
