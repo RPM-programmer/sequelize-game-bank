@@ -180,6 +180,36 @@ async function loadData() {
     if (document.getElementById("table-logs")) {
       await loadTransactionLogs();
     }
+
+    const creditContainer = document.getElementById("active-credit-actions");
+    if (creditContainer) {
+      creditContainer.innerHTML = "";
+      let creditRes = await fetch("/api/bank/accounts/my-current-credit", {
+        headers: { "Bypass-Tunnel-Reminder": "true" },
+      });
+
+      if (creditRes.ok) {
+        let creditData = await creditRes.json();
+
+        if (creditData && creditData.activeCredit) {
+          const cr = creditData.activeCredit;
+          const regularPayment = cr.totalRepay / cr.termMonths;
+
+          creditContainer.innerHTML = `
+            <div class="credit-info-block" style="margin-top: 15px;">
+              <p>Остаток по кредиту: <b>${parseFloat(cr.remainingRepay).toFixed(2)}</b> руб.</p>
+              <button class="btn btn-success" onclick="payCreditManually(${parseInt(cr.id, 10)}, ${parseFloat(regularPayment)})">
+                Внести регулярный платеж (${regularPayment.toFixed(2)} руб.)
+              </button>
+            </div>
+          `;
+        } else {
+          creditContainer.innerHTML = `<p style="color: gray; margin-top: 15px;">У вас нет активных кредитов.</p>`;
+        }
+      }
+    }
+
+    await syncProfileSectionData();
   } catch (e) {
     console.error("Критическая ошибка выполнения скрипта страницы:", e);
     window.Swal.fire({
@@ -301,58 +331,6 @@ async function executeTransfer() {
     console.error("Ошибка [" + data.statusCode + "]: " + data.message);
   }
 }
-async function applyForCredit() {
-  const targetAccountId = document.getElementById("credit-target").value;
-  const amount = document.getElementById("credit-amount").value;
-  const paymentsCount = document.getElementById("credit-payments").value;
-  const autoWithdrawal = document.getElementById("credit-auto").checked;
-  const pinCode = document.getElementById("credit-pin").value;
-  const res = await fetch("/api/bank/accounts/credit", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Bypass-Tunnel-Reminder": "true",
-    },
-    body: JSON.stringify({
-      accountId: targetAccountId,
-      amount: parseFloat(amount),
-      termMonths: parseInt(paymentsCount, 10),
-      autoRepay: autoWithdrawal,
-      pinCode: pinCode,
-      rate: 0.1,
-    }),
-  });
-  const data = await res.json();
-  if (data.success || data.status) {
-    await Swal.fire({
-      title: "Кредит",
-      text:
-        "Кредит одобрен! Деньги зачислены на счет #" +
-        (data.creditId || data.creditAccountId),
-      icon: "success",
-      confirmButtonColor: "#3085d6",
-      confirmButtonText: "Ок",
-    });
-
-    Toastify({
-      text: `Вы взяли кредит`,
-      duration: 3000,
-      style: { background: "rgb(58, 245, 11)" },
-    }).showToast();
-
-    if (typeof loadData === "function") loadData();
-  } else {
-    await Swal.fire({
-      title: "Кредит",
-      text: data.error || data.message || "Ошибка оформления кредита",
-      icon: "warning",
-      iconColor: "orange",
-      confirmButtonColor: "#3085d6",
-      confirmButtonText: "Ок",
-    });
-    console.error("Ошибка: " + (data.error || data.message));
-  }
-}
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   const logOut = await Swal.fire({
     title: "Выход",
@@ -411,16 +389,22 @@ async function syncProfileSectionData() {
       const statusText = document.getElementById("2fa-current-status");
       const toggleBtn = document.getElementById("btn-toggle-2fa");
 
-      if (user2FaActive) {
-        statusText.innerHTML =
-          'Текущий статус: <span style="color:green; font-weight:bold;">ЗАЩИЩЕН (2FA включена)</span>';
-        toggleBtn.innerText = "Отключить защиту 2FA";
-        toggleBtn.className = "btn btn-danger";
+      if (statusText && toggleBtn) {
+        if (user2FaActive) {
+          statusText.innerHTML =
+            'Текущий статус: <span style="color:green; font-weight:bold;">ЗАЩИЩЕН (2FA включена)</span>';
+          toggleBtn.innerText = "Отключить защиту 2FA";
+          toggleBtn.className = "btn btn-danger";
+        } else {
+          statusText.innerHTML =
+            'Текущий статус: <span style="color:red; font-weight:bold;">НЕБЕЗОПАСНО (2FA выключена)</span>';
+          toggleBtn.innerText = "Включить защиту 2FA";
+          toggleBtn.className = "btn";
+        }
       } else {
-        statusText.innerHTML =
-          'Текущий статус: <span style="color:red; font-weight:bold;">НЕБЕЗОПАСНО (2FA выключена)</span>';
-        toggleBtn.innerText = "Включить защиту 2FA";
-        toggleBtn.className = "btn";
+        console.log(
+          "ℹ️ Элементы управления 2FA не найдены на текущей вкладке (это нормально).",
+        );
       }
     }
   } catch (e) {
@@ -795,32 +779,56 @@ async function loadTransactionLogs() {
 }
 async function executeCreateCredit() {
   try {
-    const accountIdField = document.getElementById("credit-accountId");
+    const accountIdField =
+      document.getElementById("credit-target") ||
+      document.getElementById("credit-accountId");
     const amountField = document.getElementById("credit-amount");
-    const autoRepayField = document.getElementById("credit-autoRepay");
-    const rateField = document.getElementById("credit-rate");
-    const termMonthsField = document.getElementById("credit-termMonths");
-    if (!accountIdField || !amountField) {
+    const termMonthsField =
+      document.getElementById("credit-payments") ||
+      document.getElementById("credit-termMonths");
+    const autoRepayField =
+      document.getElementById("credit-credit-auto") ||
+      document.getElementById("credit-auto") ||
+      document.getElementById("credit-autoRepay");
+    const pinCodeField = document.getElementById("credit-pin");
+
+    if (!accountIdField || !amountField || !pinCodeField) {
       console.error(
-        "Критические элементы формы кредита не найдены в HTML дерева.",
+        "Критические элементы формы кредита (Счет, Сумма или Пин-код) не найдены в HTML.",
+      );
+      Swal.fire(
+        "Ошибка",
+        "Ошибка структуры формы. Обратитесь к администратору.",
+        "error",
       );
       return;
     }
-    const accountId = accountIdField.value;
+
+    const targetAccountId = accountIdField.value;
     const amount = parseFloat(amountField.value);
+    const pinCode = pinCodeField.value.trim();
     const autoRepay = autoRepayField ? autoRepayField.checked : false;
-    const rate = rateField ? parseFloat(rateField.value) : 0.1;
     const termMonths = termMonthsField
       ? parseInt(termMonthsField.value, 10)
       : 12;
-    if (!accountId || isNaN(amount) || amount <= 0) {
+
+    if (!targetAccountId || isNaN(amount) || amount <= 0) {
       Swal.fire(
         "Внимание",
-        "Пожалуйста, заполните номер счета и корректную сумму",
+        "Пожалуйста, выберите счет и укажите корректную сумму кредитования.",
         "warning",
       );
       return;
     }
+    if (!pinCode) {
+      Swal.fire(
+        "Внимание",
+        "Пожалуйста, введите PIN-код выбранного счета для подтверждения.",
+        "warning",
+      );
+      return;
+    }
+
     const response = await fetch("/api/bank/accounts/credit", {
       method: "POST",
       headers: {
@@ -828,37 +836,132 @@ async function executeCreateCredit() {
         "Bypass-Tunnel-Reminder": "true",
       },
       body: JSON.stringify({
-        accountId,
-        amount,
-        autoRepay,
-        rate,
-        termMonths,
+        targetAccountId: targetAccountId,
+        amount: amount,
+        paymentsCount: termMonths,
+        autoWithdrawal: autoRepay,
+        pinCode: pinCode,
       }),
     });
+
     if (!response.ok) {
       throw new Error(`Ошибка сервера: ${response.status}`);
     }
+
     const result = await response.json();
-    if (result.success) {
-      Swal.fire(
-        "Успех!",
-        result.message || "Кредит успешно оформлен",
-        "success",
-      ).then(() => {
-        location.href = "/bank/accounts.html";
+
+    if (result.success || result.status) {
+      await Swal.fire({
+        title: "Успех!",
+        text:
+          result.message ||
+          `Кредит одобрен! Деньги зачислены на счет #${targetAccountId}`,
+        icon: "success",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Ок",
       });
+
+      Toastify({
+        text: `Вы успешно взяли кредит`,
+        duration: 3000,
+        style: { background: "rgb(58, 245, 11)" },
+      }).showToast();
+
+      window.location.href = "/bank/accounts.html";
     } else {
-      Swal.fire(
-        "Ошибка оформления",
-        result.error || "Не удалось выдать кредит",
-        "error",
+      Swal.fire({
+        title: "Ошибка оформления",
+        text: result.error || result.message || "Не удалось выдать кредит",
+        icon: "warning",
+        iconColor: "orange",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Ок",
+      });
+      console.error(
+        "Ошибка оформления кредита: " + (result.error || result.message),
       );
     }
   } catch (error) {
     console.error("Ошибка выполнения executeCreateCredit:", error);
     Swal.fire(
       "Критическая ошибка",
-      "Не удалось связаться с сервером банка",
+      "Не удалось связаться с сервером банка или обработать запрос",
+      "error",
+    );
+  }
+}
+async function payCreditManually(creditId, defaultAmount) {
+  const { value: formValues } = await Swal.fire({
+    title: "Погашение кредита",
+    html:
+      `<div style="text-align: left; margin-bottom: 8px;"><label style="font-weight:bold;">Сумма платежа (руб.)</label></div>` +
+      `<input id="swal-pay-amount" class="swal2-input" type="number" value="${parseFloat(defaultAmount).toFixed(2)}" min="1" step="any">` +
+      `<div style="text-align: left; margin-top: 12px; margin-bottom: 8px;"><label style="font-weight:bold;">PIN-код вашего счета</label></div>` +
+      `<input id="swal-pay-pin" class="swal2-input" type="password" placeholder="••••" maxlength="4">`,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: "Оплатить",
+    cancelButtonText: "Отмена",
+    preConfirm: () => {
+      const amountVal = document.getElementById("swal-pay-amount").value;
+      const pinVal = document.getElementById("swal-pay-pin").value;
+      return {
+        amount: amountVal,
+        pinCode: pinVal,
+      };
+    },
+  });
+
+  if (!formValues || !formValues.amount || !formValues.pinCode) return;
+
+  try {
+    const res = await fetch("/api/bank/accounts/credit/pay", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Bypass-Tunnel-Reminder": "true",
+      },
+      body: JSON.stringify({
+        creditId: parseInt(creditId, 10),
+        amount: parseFloat(formValues.amount),
+        pinCode: formValues.pinCode.trim(),
+      }),
+    });
+
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const textError = await res.text();
+      console.error("Критический ответ бэка:", textError);
+      Swal.fire(
+        "Ошибка сервера",
+        "Сервер вернул некорректный текстовый ответ. Проверьте консоль Node.js.",
+        "error",
+      );
+      return;
+    }
+
+    const data = await res.json();
+
+    if (data.status) {
+      await Swal.fire({
+        title: "Успех!",
+        text: data.message,
+        icon: "success",
+      });
+
+      if (typeof loadData === "function") loadData();
+    } else {
+      Swal.fire(
+        "Ошибка оплаты",
+        data.message || "Не удалось провести транзакцию",
+        "warning",
+      );
+    }
+  } catch (err) {
+    console.error("Ошибка запроса:", err);
+    Swal.fire(
+      "Критическая ошибка",
+      "Не удалось связаться с сервером банка.",
       "error",
     );
   }

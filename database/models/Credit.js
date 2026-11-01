@@ -1,37 +1,50 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 const path = require("path");
-const sequelize = require(path.join(__dirname, '..', 'config', 'init-db.js'));
-const Account = require(path.join(__dirname, 'Account.js'));
-const Credit = sequelize.define('credit', {
+const sequelize = require(path.join(__dirname, "..", "config", "init-db.js"));
+const Account = require(path.join(__dirname, "Account.js"));
+
+const Credit = sequelize.define("credit", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
-    primaryKey: true
+    primaryKey: true,
   },
-  account_id: {
+  accountId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: { model: Account, key: 'id' },
-    onDelete: 'CASCADE'
+    references: { model: Account, key: "id" },
+    onDelete: "CASCADE",
   },
-  total_payments: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  remaining_payments: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  payment_amount: {
+  amount: {
     type: DataTypes.DECIMAL(15, 2),
-    allowNull: false
+    allowNull: false,
   },
-  auto_withdrawal: {
+  totalRepay: {
+    type: DataTypes.DECIMAL(15, 2),
+    allowNull: false,
+  },
+  remainingRepay: {
+    type: DataTypes.DECIMAL(15, 2),
+    allowNull: false,
+  },
+  termMonths: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  autoRepay: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false
-  }
+    defaultValue: false,
+  },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "active",
+  },
 });
-Account.hasMany(Credit, { foreignKey: 'account_id' });
-Credit.belongsTo(Account, { foreignKey: 'account_id', as: 'linkedAccount' });
+
+// Настройка связей с учетом нового имени внешнего ключа accountId
+Account.hasMany(Credit, { foreignKey: "accountId" });
+Credit.belongsTo(Account, { foreignKey: "accountId", as: "linkedAccount" });
+
 module.exports = Credit;

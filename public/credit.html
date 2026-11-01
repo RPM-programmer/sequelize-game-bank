@@ -1,90 +1,148 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <title>City-Bank | Кредитование</title>
-  <link rel="stylesheet" href="/api/bank/css/style.css">
-  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css"/>
-</head>
-<body>
-  <div class="main-container">
+  <head>
+    <meta charset="UTF-8" />
+    <title>City-Bank | Кредитование</title>
+    <link rel="stylesheet" href="/api/bank/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/tippy.js@6/animations/scale.css"
+    />
+  </head>
+  <body>
+    <div class="main-container">
       <div class="sidebar">
-      <div style="text-align: center; margin-bottom: 15px;">
-        <img id="user-avatar" src="/api/bank/uploads/avatars/default.png" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #1abc9c;">
+        <div style="text-align: center; margin-bottom: 15px">
+          <img
+            id="user-avatar"
+            src="/api/bank/uploads/avatars/default.png"
+            style="
+              width: 80px;
+              height: 80px;
+              border-radius: 50%;
+              object-fit: cover;
+              border: 3px solid #1abc9c;
+            "
+          />
+        </div>
+        <h2 id="user-display">Загрузка...</h2>
+        <p style="text-align: center; color: #bbb">
+          Всего средств:
+          <span id="total-manny" style="font-weight: bold; color: #1abc9c"
+            >0.00</span
+          >
+          руб.
+        </p>
+        <hr style="border-color: #34495e" />
+        <a href="/bank/general.html" class="nav-item"
+          ><button class="menu-btn" id="general">Главная</button></a
+        >
+        <a href="/bank/accounts.html" class="nav-item"
+          ><button class="menu-btn" id="acccount">Мои Счета</button></a
+        >
+        <a href="/bank/transfer.html" class="nav-item"
+          ><button class="menu-btn" id="transfer">Перевод средств</button></a
+        >
+        <a href="/bank/history.html" class="nav-item"
+          ><button class="menu-btn" id="history">История транзакций</button></a
+        >
+        <a class="nav-item"
+          ><button class="menu-btn active" id="credit">
+            Оформить Кредит
+          </button></a
+        >
+        <a href="/bank/profile.html" class="nav-item"
+          ><button class="menu-btn" id="profile">Управление профилем</button></a
+        >
+        <button
+          class="menu-btn"
+          onclick="location.href = '/bank/admin.html'"
+          id="admin-nav"
+          style="display: none; color: #ffc107"
+        >
+          Админ-панель
+        </button>
+        <br /><br />
+        <button
+          class="menu-btn btn-danger"
+          id="logoutBtn"
+          style="text-align: center"
+        >
+          Выйти из системы
+        </button>
       </div>
-      <h2 id="user-display">Загрузка...</h2>
-      <p style="text-align: center; color: #bbb;">Всего средств: <span id="total-manny" style="font-weight: bold; color: #1abc9c;">0.00</span> руб.</p>
-      <hr style="border-color: #34495e;">
-      <a href="/bank/general.html" class="nav-item"><button class="menu-btn" id="general">Главная</button></a>
-      <a href="/bank/accounts.html" class="nav-item"><button class="menu-btn" id="acccount">Мои Счета</button></a>
-      <a href="/bank/transfer.html" class="nav-item"><button class="menu-btn" id="transfer">Перевод средств</button></a>
-      <a href="/bank/history.html" class="nav-item"><button class="menu-btn" id="history">История транзакций</button></a>
-      <a class="nav-item"><button class="menu-btn active" id="credit">Оформить Кредит</button></a>
-      <a href="/bank/profile.html" class="nav-item"><button class="menu-btn" id="profile">Управление профилем</button></a>
-  <button class="menu-btn" onclick="location.href='/bank/admin.html'" id="admin-nav" style="display: none; color: #ffc107;">Админ-панель</button>
-      <br><br>
-      <button class="menu-btn btn-danger" id="logoutBtn" style="text-align: center;">Выйти из системы</button>
-    </div>
 
-    <div class="container">
-      <div class="container-center">
+      <div class="card">
         <h3>Заявка на автономный кредит City-bank</h3>
-    <div class="card">
-      <div class="form-group">
-        <label>Счет для зачисления кредита</label>
-        <select id="credit-target"></select>
-      </div>
-      <div class="form-group">
-        <label>Сумма кредитования</label>
-        <input type="number" id="credit-amount" placeholder="0.00">
-      </div>
-      <div class="form-group">
-        <label>Срок погашения (Кол-во платежей)</label>
-        <input type="number" id="credit-payments" placeholder="Например: 12">
-      </div>
-      <div class="checkbox-group" style="margin-bottom: 15px;">
-        <input type="checkbox" id="credit-auto" checked style="width: auto;">
-        <label style="display: inline;" for="credit-auto">Разрешить автоматическое списание взносов со счета</label>
-      </div>
-      <div class="form-group">
-        <label>Пин-код счета</label>
-        <input type="password" id="credit-pin" placeholder="Введите пин-код счета">
-      </div>
-      <button class="btn" onclick="applyForCredit()">Оформить заем</button>
-    </div>
-    <div class="card">
-  <div class="form-group">
-    <label>Счет для зачисления</label>
-    <select id="credit-accountId"></select> <!-- Должен быть select или input -->
-  </div>
-  <div class="form-group">
-    <label>Сумма кредита (руб.)</label>
-    <input type="number" id="credit-amount" placeholder="0.00">
-  </div>
-  <div class="form-group">
-    <label>Срок кредитования (месяцев)</label>
-    <input type="number" id="credit-termMonths" value="12">
-  </div>
-  <div class="form-group">
-    <label>Процентная ставка (доля)</label>
-    <input type="number" id="credit-rate" value="0.1" step="0.01">
-  </div>
-  <div class="form-group">
-    <label>
-      <input type="checkbox" id="credit-autoRepay"> Автоматическое погашение
-    </label>
-  </div>
-  <!-- Кнопка вызывает функцию оформления кредита -->
-  <button class="btn" onclick="executeCreateCredit()">Оформить Кредит</button>
-</div>
 
+        <div class="form-group">
+          <label for="credit-target">Счет для зачисления кредита</label>
+          <select id="credit-target" class="form-control" required>
+            <option value="">Загрузка счетов...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="credit-amount">Сумма кредитования (руб.)</label>
+          <input
+            type="number"
+            id="credit-amount"
+            class="form-control"
+            placeholder="Например, 50000"
+            min="1"
+            step="any"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="credit-payments"
+            >Срок погашения (Кол-во платежей / месяцев)</label
+          >
+          <input
+            type="number"
+            id="credit-payments"
+            class="form-control"
+            value="12"
+            min="1"
+            required
+          />
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="credit-auto" />
+          <label for="credit-auto"
+            >Разрешить автоматическое списание взносов со счета</label
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="credit-pin">Пин-код счета</label>
+          <input
+            type="password"
+            id="credit-pin"
+            class="form-control"
+            placeholder="••••"
+            maxlength="4"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="executeCreateCredit()"
+        >
+          Оформить Кредит
+        </button>
+        <div id="active-credit-actions"></div>
       </div>
     </div>
-  </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
-<script src="/api/bank/js/sweetalert2.js"></script>
-<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
-<script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
-<script src="/api/bank/js/js.js"></script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+    <script src="/api/bank/js/sweetalert2.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+    <script src="/api/bank/js/js.js"></script>
+  </body>
 </html>
