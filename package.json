@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "chalk-palette": "^2.0.0",
+    "chalk-palette": "^4.1.0",
     "cookie-parser": "^1.4.7",
-    "custom-color-logs": "^3.2.1",
+    "custom-color-logs": "^3.2.2",
     "dotenv": "^18.0.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
